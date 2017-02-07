@@ -18,41 +18,73 @@ using namespace std;
 
 void TestString()
 {
-  String str("hello"), str2(str);
-  str = "sup";
-  assert(str == "sup");
-  assert(str2 == "hello");
-  str = str2;
-  assert(str == str);
-  str = String("blue");
-  assert(str == "blue");
-
-  String a("hey");
-  assert(a[0] == 'h');
-  assert(a[1] == 'e');
-  assert(a[2] == 'y');
-  assert(a[3] == '\0');
-  a.reserve(20);
-  assert(a.size() == 20);
+  String a("char");
+  assert(a == "char");
+  String b(a);
+  assert(b == "char");
+  assert(b.size() == 4);
+  String c(a + b);
+  assert(c == "charchar");
+  cout << c << endl;
+  b = c;
+  assert(b == "charchar");
+  b = "Hello";
+  assert(c == "charchar");
+  a = '!';
+  assert(a == "!");
+  c = b + a + " Hi";
+  assert(c == "Hello! Hi");
+  cout << c << endl;
+  c += a;
+  c += "..?";
+  assert(c == "Hello! Hi!..?");
+  cout << c << endl;
+  c[9] = '.';
+  c.at(c.size() - 1) = '!';
+  assert(c == "Hello! Hi...!");
+  cout << c << endl;
   try {
-    char c = a.at(21);
+    char x = c.at(21);
   }
   catch (const out_of_range& oor)
   {
     cout << "Index out of range: " << oor.what() << endl;
   }
+  assert(c == "Hello! Hi...!");
+  cout << c << endl;
 
-  String b("Hello"), c("world!");
-  a = b + c;
-  a = b + " " + c;
-  assert(a == "Hello world!");
+  const char* d = c.data();
+  cout << d << endl;
+  assert(d == c);
+  c = "12345";
+  c.reserve(50);
+  assert(c.capacity() == 50);
+  c.push_back('!');
+  assert(c == "12345!");
+  c.shrink_to_fit();
+  cout << "String: '" << c << '\'' << endl;
+  cout << "Size: " << c.size() << endl;
+  cout << "Capacity: " << c.capacity() << endl;
 
-  const char* p = a.data();
-  assert(p == a);
+  c.resize(5);
+  assert(c == "12345");
+  c.push_back('!');
+  cout << "String: '" << c << '\'' << endl;
+  cout << "Size: " << c.size() << endl;
+  cout << "Capacity: " << c.capacity() << endl;
 
-  b += " ";
-  b += c;
-  assert(b == "Hello world!");
+  const String str = "boohoo";
+  //str.at(0) = 'a';  // compiler error
+  //str[0] = 'a';     // compiler error
+
+  String str2("");
+  assert(str2.size() == 0);
+  str2 += "";
+  assert(str2 == "");
+
+  for (int i = 0; i < 1000; i++)
+    str2.push_back('0');
+  cout << "Number of chars copied: " << g_ops << endl;
 }
 
 int main()

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "String.h"
 
+int g_ops;
+
 String::String()
 {
 }
@@ -8,52 +10,65 @@ String::String()
 
 String::~String()
 {
-  delete m_cstr;
+  delete m_begin;
 }
 
 String::String(const String & rhs)
 {
-  CopyCstring(rhs.m_cstr);
+  Copy(rhs.m_begin);
 }
 
-String::String(const String && rhs)
+String::String(String && rhs)
 {
-  CopyCstring(rhs.m_cstr);
+  this->m_begin = rhs.m_begin;
+  this->m_end = rhs.m_end;
+  this->m_capacity = rhs.m_capacity;
+  rhs.m_begin = nullptr;
+  rhs.m_end = nullptr;
 }
 
 String::String(const char * cstr)
 {
-  CopyCstring(cstr);
+  Copy(cstr);
 }
 
 String & String::operator=(const String & rhs)
 {
-  CopyCstring(rhs.m_cstr);
+  Copy(rhs.m_begin);
   return *this;
 }
 
-String & String::operator=(const String && rhs)
+String & String::operator=(String && rhs)
 {
-  CopyCstring(rhs.m_cstr);
+  delete m_begin;
+  m_begin = rhs.m_begin;
+  m_end = rhs.m_end;
+  m_capacity = rhs.m_capacity;
+  rhs.m_begin = nullptr;
   return *this;
 }
 
 String & String::operator=(const char * cstr)
 {
-  CopyCstring(cstr);
+  Copy(cstr);
   return *this;
 }
 
 String & String::operator=(const char ch)
 {
-  delete m_cstr;
-  m_cstr = new char(ch);
+  char* temp = new char[2]; // can throw
+  delete m_begin;
+  this->m_capacity = 2;
+  m_begin = temp;
+  m_begin[0] = ch;
+  m_begin[1] = '\0';
+  m_end = &m_begin[1];
   return *this;
 }
 
 String & String::operator+=(const String & rhs)
 {
-  *this = *this + rhs.m_cstr;
+  *this = *this + rhs;
   return *this;
 }
 
@@ -65,114 +80,168 @@ String & String::operator+=(const char * cstr)
 
 String String::operator+(const String & rhs) const
 {
-  return String(*this + rhs.m_cstr);
+  int len = size();
+  int length = len + rhs.size();
+  String result;
+  result.reserve(length);
+  char * rItr = result.m_begin;
+  for (const char* itr = m_begin; itr != m_end; itr++)
+    *rItr++ = *itr;
+  for (const char* itr = rhs.m_begin; itr != rhs.m_end; itr++)
+    *rItr++ = *itr;
+  result[length] = '\0';
+  result.m_end = &result[length];
+  return result;
 }
 
 String String::operator+(const char * cstr) const
 {
-  int size = this->size();
-  int length = size + strlen(cstr);
+  int len = size();
+  int length = len + strlen(cstr);
   String result;
   result.reserve(length);
-  //result.m_cstr = new char[length + 1];
-  for (int i = 0; i < size; i++)
-  {
-    result[i] = m_cstr[i];
-  }
-  for (int i = size; i < size + strlen(cstr); i++)
-  {
-    result[i] = cstr[i - size];
-  }
-  result[length] = '\0';
-  return String(result);
+  char * rItr = result.m_begin;
+  for (const char* itr = m_begin; itr != m_end; itr++)
+    *rItr++ = *itr;
+  for (const char* itr = cstr; *itr != '\0'; itr++)
+    *rItr++ = *itr;
+  result.m_end = &result[length];
+  return result;
 }
 
-char & String::at(size_t i) const
+char & String::at(size_t i)
 {
-  if (i > size() || i < 0)
+  return const_cast<char&>(const_cast<const String*>(this)->at(i));
+}
+
+const char & String::at(size_t i) const
+{
+  if (i > size() - 1 || i < 0)
     throw std::out_of_range("String.at()");
   else
-    return m_cstr[i];
+    return m_begin[i];
 }
 
-char & String::operator[](size_t i) const
+char & String::operator[](size_t i)
 {
-  return m_cstr[i];
+  return m_begin[i];
+}
+
+const char & String::operator[](size_t i) const
+{
+  return m_begin[i];
 }
 
 const char * String::data() const
 {
-  return m_cstr;
+  return m_begin;
 }
 
 int String::size() const
 {
-  return strlen(m_cstr);
+  return strlen(m_begin);
 }
 
 void String::reserve(size_t n)
 {
-  if (m_cstr != nullptr && strlen(m_cstr) >= n)
+  if (m_begin != nullptr && size() >= n)
+  {
+    shrink_to_fit();
     return;
+  }
   resize(n);
+}
+
+int String::capacity() const
+{
+  return m_capacity;
+}
+
+void String::shrink_to_fit()
+{
+  if (size() == m_capacity)
+    return;
+  resize(size());
+}
+void String::push_back(char c)
+{
+  int len = size();
+  if (len == m_capacity)
+  {
+    reserve(1 + len * 2);
+    g_ops += len;
+  }
+  m_begin[len] = c;
+  m_begin[len + 1] = '\0';
+  m_end++;
 }
 
 void String::resize(size_t n)
 {
-  if (m_cstr == nullptr)
+  char* temp = new char[n + 1]; // can throw
+  if (m_begin != nullptr)
   {
-    m_cstr = new char[n + 1];
-    m_cstr[n] = '\0';
-    return;
+    for (int i = 0; i < n || &m_begin[i] == m_end; i++)
+      temp[i] = m_begin[i];
+    delete m_begin;
   }
-  char* temp = new char[n + 1];   // [h][e][y][\0] resize(2)
-  for (int i = 0; i < n; i++)
-  {
-    if (m_cstr[i] == '\0')
-      break;
-    temp[i] = m_cstr[i];
-  }
-  temp[n] = '\0';
-  delete m_cstr;
-  m_cstr = temp;
+  m_begin = temp;
+  m_end = &temp[n];
+  *m_end = '\0';
+  m_capacity = n;
 }
 
 bool operator==(const String & lhs, const String & rhs)
 {
-  return *lhs.m_cstr == *rhs.m_cstr;
+  return lhs == rhs.m_begin;
 }
 
 bool operator==(const String & lhs, const char * rhs)
 {
-  return *lhs.m_cstr == *rhs;
+  const char *itrL = lhs.m_begin;
+  const char *itrR = rhs;
+  while (itrL != lhs.m_end && *itrR != '\0')
+  {
+    if (*itrL++ != *itrR++)
+      return false;
+  }
+  return true;
 }
 
 std::ostream & operator<<(std::ostream & cout, const String & str)
 {
-  cout << str.m_cstr;
+  cout << str.m_begin;
   return cout;
 }
 
-void String::CopyCstring(const char * from)
+void String::Copy(const char * from)
 {
-  delete m_cstr;
-  m_cstr = new char[strlen(from) + 1];
+  int cap = strlen(from) + 1;
+  char* temp = new char[cap]; // can throw
+  delete m_begin;
+  this->m_capacity = cap;
+  m_begin = temp;
   int i = 0;
   for (const char* itr = from; *itr != '\0'; itr++)
   {
-    m_cstr[i++] = *itr;
+    m_begin[i++] = *itr;
   }
-  m_cstr[i] = '\0';
+  m_begin[i] = '\0';
+  m_end = &m_begin[i];
 }
 
-void String::CopyCstring(char * to, const char * from)
-{
-  delete to;
-  to = new char[strlen(from) + 1];
-  int i = 0;
-  for (const char* itr = from; *itr != '\0'; itr++)
-  {
-    to[i++] = *itr;
-  }
-  to[i] = '\0';
-}
+//void String::Copy(const String& from)
+//{
+//  delete m_begin;
+//  int cap = from.size() + 1;
+//  this->m_capacity = cap;
+//  m_begin = new char[cap];
+//  int i = 0;
+//  for (const char* itr = from.m_begin; itr != from.m_end; itr++)
+//  {
+//    m_begin[i++] = *itr;
+//  }
+//  m_begin[i] = '\0';
+//  m_end = &m_begin[i];
+//}
+
