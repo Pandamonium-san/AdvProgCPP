@@ -19,7 +19,6 @@ public:
     return list.Print(cout);
   }
   void Check() const;
-  static void TestDLL();
 private:
   std::ostream& Print(std::ostream& cout) const;
 };

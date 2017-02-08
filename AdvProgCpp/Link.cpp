@@ -77,12 +77,24 @@ T * Link<T>::DeleteBefore()
 
 template<class T>
 template<class X>
-T * Link<T>::Find(const X& searchFor) const
+T * Link<T>::Find(const X & searchFor)
+{
+  for (T* it = Next(); it != nullptr; it = it->Next())
+  {
+    if (*it == searchFor)
+      return it;
+  }
+  return nullptr;
+}
+
+template<class T>
+template<class X>
+const T * Link<T>::Find(const X& searchFor) const
 {
   for (const T* it = Next(); it != nullptr; it = it->Next())
   {
     if (*it == searchFor)
-      return const_cast<T*>(it);
+      return it;
   }
   return nullptr;
 }

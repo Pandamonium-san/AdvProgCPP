@@ -5,6 +5,10 @@ int g_ops;
 
 String::String()
 {
+  m_begin = new char[4];
+  m_end = m_begin;
+  *m_end = '\0';
+  m_capacity = 3;
 }
 
 
@@ -15,7 +19,7 @@ String::~String()
 
 String::String(const String & rhs)
 {
-  Copy(rhs.m_begin);
+  Copy(rhs);
 }
 
 String::String(String && rhs)
@@ -32,9 +36,20 @@ String::String(const char * cstr)
   Copy(cstr);
 }
 
+String::String(const char ch)
+{
+  char* temp = new char[2]; // can throw
+  delete m_begin;
+  this->m_capacity = 2;
+  m_begin = temp;
+  m_begin[0] = ch;
+  m_begin[1] = '\0';
+  m_end = &m_begin[1];
+}
+
 String & String::operator=(const String & rhs)
 {
-  Copy(rhs.m_begin);
+  Copy(rhs);
   return *this;
 }
 
@@ -48,65 +63,15 @@ String & String::operator=(String && rhs)
   return *this;
 }
 
-String & String::operator=(const char * cstr)
-{
-  Copy(cstr);
-  return *this;
-}
-
-String & String::operator=(const char ch)
-{
-  char* temp = new char[2]; // can throw
-  delete m_begin;
-  this->m_capacity = 2;
-  m_begin = temp;
-  m_begin[0] = ch;
-  m_begin[1] = '\0';
-  m_end = &m_begin[1];
-  return *this;
-}
-
 String & String::operator+=(const String & rhs)
 {
   *this = *this + rhs;
   return *this;
 }
 
-String & String::operator+=(const char * cstr)
+String::operator bool()
 {
-  *this = *this + cstr;
-  return *this;
-}
-
-String String::operator+(const String & rhs) const
-{
-  int len = size();
-  int length = len + rhs.size();
-  String result;
-  result.reserve(length);
-  char * rItr = result.m_begin;
-  for (const char* itr = m_begin; itr != m_end; itr++)
-    *rItr++ = *itr;
-  for (const char* itr = rhs.m_begin; itr != rhs.m_end; itr++)
-    *rItr++ = *itr;
-  result[length] = '\0';
-  result.m_end = &result[length];
-  return result;
-}
-
-String String::operator+(const char * cstr) const
-{
-  int len = size();
-  int length = len + strlen(cstr);
-  String result;
-  result.reserve(length);
-  char * rItr = result.m_begin;
-  for (const char* itr = m_begin; itr != m_end; itr++)
-    *rItr++ = *itr;
-  for (const char* itr = cstr; *itr != '\0'; itr++)
-    *rItr++ = *itr;
-  result.m_end = &result[length];
-  return result;
+  return size() > 0;
 }
 
 char & String::at(size_t i)
@@ -139,7 +104,10 @@ const char * String::data() const
 
 int String::size() const
 {
-  return strlen(m_begin);
+  int size = 0;
+  for (const char* itr = m_begin; itr != m_end; itr++)
+    ++size;
+  return size;
 }
 
 void String::reserve(size_t n)
@@ -179,33 +147,57 @@ void String::push_back(char c)
 void String::resize(size_t n)
 {
   char* temp = new char[n + 1]; // can throw
-  if (m_begin != nullptr)
-  {
-    for (int i = 0; i < n || &m_begin[i] == m_end; i++)
-      temp[i] = m_begin[i];
-    delete m_begin;
-  }
-  m_begin = temp;
-  m_end = &temp[n];
-  *m_end = '\0';
+  temp[n] = '\0';
   m_capacity = n;
+  if (m_begin == nullptr)
+  {
+    m_begin = temp;
+    m_end = &temp[n];
+    return;
+  }
+  int i = 0;
+  const char* itr = m_begin;
+  while (i < n && itr != m_end)
+  {
+    temp[i++] = *itr++;
+  }
+  delete m_begin;
+  m_end = &temp[i];
+  *m_end = '\0';
+  m_begin = temp;
 }
 
 bool operator==(const String & lhs, const String & rhs)
 {
-  return lhs == rhs.m_begin;
-}
-
-bool operator==(const String & lhs, const char * rhs)
-{
   const char *itrL = lhs.m_begin;
-  const char *itrR = rhs;
-  while (itrL != lhs.m_end && *itrR != '\0')
+  const char *itrR = rhs.m_begin;
+  while (itrL != lhs.m_end && itrR != rhs.m_end)
   {
     if (*itrL++ != *itrR++)
       return false;
   }
   return true;
+}
+
+bool operator!=(const String & lhs, const String & rhs)
+{
+  return !(lhs == rhs);
+}
+
+String operator+(const String & lhs, const String & rhs)
+{
+  int len = lhs.size();
+  int length = len + rhs.size();
+  String result;
+  result.reserve(length);
+  char * rItr = result.m_begin;
+  for (const char* itr = lhs.m_begin; itr != lhs.m_end; itr++)
+    *rItr++ = *itr;
+  for (const char* itr = rhs.m_begin; itr != rhs.m_end; itr++)
+    *rItr++ = *itr;
+  result[length] = '\0';
+  result.m_end = &result[length];
+  return result;
 }
 
 std::ostream & operator<<(std::ostream & cout, const String & str)
@@ -217,10 +209,13 @@ std::ostream & operator<<(std::ostream & cout, const String & str)
 void String::Copy(const char * from)
 {
   int cap = strlen(from) + 1;
-  char* temp = new char[cap]; // can throw
-  delete m_begin;
-  this->m_capacity = cap;
-  m_begin = temp;
+  if (m_capacity < cap)
+  {
+    char* temp = new char[cap]; // can throw
+    delete m_begin;
+    m_begin = temp;
+    this->m_capacity = cap - 1;
+  }
   int i = 0;
   for (const char* itr = from; *itr != '\0'; itr++)
   {
@@ -230,18 +225,21 @@ void String::Copy(const char * from)
   m_end = &m_begin[i];
 }
 
-//void String::Copy(const String& from)
-//{
-//  delete m_begin;
-//  int cap = from.size() + 1;
-//  this->m_capacity = cap;
-//  m_begin = new char[cap];
-//  int i = 0;
-//  for (const char* itr = from.m_begin; itr != from.m_end; itr++)
-//  {
-//    m_begin[i++] = *itr;
-//  }
-//  m_begin[i] = '\0';
-//  m_end = &m_begin[i];
-//}
+void String::Copy(const String& from)
+{
+  if (m_capacity < from.m_capacity)
+  {
+    char* temp = new char[from.m_capacity + 1]; // can throw
+    delete m_begin;
+    m_begin = temp;
+    this->m_capacity = from.m_capacity;
+  }
+  int i = 0;
+  for (const char* itr = from.m_begin; *itr != '\0'; itr++)
+  {
+    m_begin[i++] = *itr;
+  }
+  m_begin[i] = '\0';
+  m_end = &m_begin[i];
+}
 

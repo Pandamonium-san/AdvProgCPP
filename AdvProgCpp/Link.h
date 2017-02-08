@@ -20,6 +20,8 @@ public:
   T* DeleteAfter();
   T* DeleteBefore();
   template <class X>
-  T* Find(const X& searchFor) const;
+  T* Find(const X& searchFor);
+  template <class X>
+  const T* Find(const X& searchFor) const;
   virtual std::ostream& Print(std::ostream& cout) const { return cout; }
 };
