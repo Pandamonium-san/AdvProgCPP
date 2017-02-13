@@ -176,6 +176,8 @@ bool operator==(const String & lhs, const String & rhs)
     if (*itrL++ != *itrR++)
       return false;
   }
+  if (*itrL++ != *itrR++)
+    return false;
   return true;
 }
 
@@ -202,7 +204,10 @@ String operator+(const String & lhs, const String & rhs)
 
 std::ostream & operator<<(std::ostream & cout, const String & str)
 {
-  cout << str.m_begin;
+  for (const char* itr = str.m_begin; itr != str.m_end; itr++)
+  {
+    cout << *itr;
+  }
   return cout;
 }
 
@@ -235,7 +240,7 @@ void String::Copy(const String& from)
     this->m_capacity = from.m_capacity;
   }
   int i = 0;
-  for (const char* itr = from.m_begin; *itr != '\0'; itr++)
+  for (const char* itr = from.m_begin; itr != from.m_end; itr++)
   {
     m_begin[i++] = *itr;
   }

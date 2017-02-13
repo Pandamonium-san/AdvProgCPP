@@ -1,4 +1,5 @@
 #pragma once
+#include <assert.h>
 #define VG
 extern void TestDLL();
 extern void TestString();

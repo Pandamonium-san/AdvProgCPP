@@ -132,6 +132,7 @@ void TestString()
   const String str = "boohoo";
   //str.at(0) = 'a';  // compiler error
   //str[0] = 'a';     // compiler error
+  //char& ch = str[0];// compiler error
 
   String str2("");
   assert(str2.size() == 0);
@@ -142,6 +143,16 @@ void TestString()
     str2.push_back('0');
   cout << "Number of chars copied: " << g_ops << endl;
 
+  a = "hej";
+  a.push_back('\0');
+  a.push_back('\0');
+  a.push_back('a');
+  a.push_back('b');
+  b = a;
+  b.push_back('c');
+  assert(a != b);
+  cout << a << endl;
+  cout << b << endl;
   cout << "String test passed" << endl << endl;
 }
 
@@ -181,7 +192,6 @@ void TestPushBackReallocation() {
   assert(str.size() == str.capacity());
   assert(i == str.size());
 }
-
 void TestFörGodkäntString() {
   //-	String()
   String str0;
@@ -238,7 +248,6 @@ void TestFörGodkäntString() {
   cout << "Om det står hej på föregående rad så är TestFörGodkänt klar\n";
 
 }
-
 void TestFörVälGodkäntString() {
 #ifdef VG
   String str("bar");
