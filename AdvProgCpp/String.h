@@ -29,10 +29,10 @@ public:
   const char* data() const;
   int size() const;
   void reserve(size_t n);
+  void resize(size_t n);
   int capacity() const;
   void shrink_to_fit();
   void push_back(char c);
-  void resize(size_t n);
 
   friend bool operator==(const String& lhs, const String& rhs);
   friend bool operator!=(const String& lhs, const String& rhs);

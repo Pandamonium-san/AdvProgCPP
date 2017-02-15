@@ -10,12 +10,11 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <iostream>
-#include <string>
-#include "List.cpp"
-#include "Node.cpp"
-#include "String.h"
+
 #include "Tests.h"
+
 using namespace std;
+using namespace Tests;
 
 int main()
 {
@@ -23,8 +22,12 @@ int main()
 
   //TestDLL();
   //TestString();
-  TestFörGodkäntString();
-  TestFörVälGodkäntString();
+  //TestStringG();
+  //TestStringVG();
+  TestAlgorithmsUppg1();
+  TestAlgorithmsUppg2();
+  TestAlgorithmsUppg3();
+
   std::cin.get();
   return 0;
 }

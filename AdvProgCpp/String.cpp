@@ -117,7 +117,38 @@ void String::reserve(size_t n)
     shrink_to_fit();
     return;
   }
-  resize(n);
+
+  char* temp = (char*)malloc(sizeof(char)*n + 1);
+  temp[n] = '\0';
+  m_capacity = n;
+
+  int i = 0;
+  const char* itr = m_begin;
+  while (i < n && itr != m_end)
+  {
+    temp[i++] = *itr++;
+  }
+  delete m_begin;
+  m_end = &temp[i];
+  *m_end = '\0';
+  m_begin = temp;
+}
+
+void String::resize(size_t n)
+{
+  char* temp = new char[n + 1]; // can throw
+  temp[n] = '\0';
+  m_capacity = n;
+
+  int i = 0;
+  const char* itr = m_begin;
+  while (i < n && itr != m_end)
+  {
+     temp[i++] = *itr++;
+  }
+  delete m_begin;
+  m_end = &temp[n];
+  m_begin = temp;
 }
 
 int String::capacity() const
@@ -142,29 +173,6 @@ void String::push_back(char c)
   m_begin[len] = c;
   m_begin[len + 1] = '\0';
   m_end++;
-}
-
-void String::resize(size_t n)
-{
-  char* temp = new char[n + 1]; // can throw
-  temp[n] = '\0';
-  m_capacity = n;
-  if (m_begin == nullptr)
-  {
-    m_begin = temp;
-    m_end = &temp[n];
-    return;
-  }
-  int i = 0;
-  const char* itr = m_begin;
-  while (i < n && itr != m_end)
-  {
-    temp[i++] = *itr++;
-  }
-  delete m_begin;
-  m_end = &temp[i];
-  *m_end = '\0';
-  m_begin = temp;
 }
 
 bool operator==(const String & lhs, const String & rhs)
@@ -247,4 +255,3 @@ void String::Copy(const String& from)
   m_begin[i] = '\0';
   m_end = &m_begin[i];
 }
-
