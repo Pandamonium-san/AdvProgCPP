@@ -2,8 +2,8 @@
 #include "stdafx.h"
 #include "Node.h"
 
-template<class T>
-Node<T>::Node(T item)
+template<class ValueType>
+Node<ValueType>::Node(ValueType item)
 {
   this->data = item;
 }

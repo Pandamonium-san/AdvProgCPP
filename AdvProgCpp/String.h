@@ -1,15 +1,20 @@
 #pragma once
 #include <iostream>
-extern int g_ops;
+#include "StringItr.h"
+
+
 class String
 {
   int m_capacity;
-  char* m_begin = nullptr;
-  char* m_end = nullptr;
+  char* m_begin;
+  char* m_end;
 
-  inline void Copy(const char* from);
-  inline void Copy(const String& from);
+  inline void Copy(const char* from, int len, bool remove);
+  bool Invariant() const;
 public:
+  typedef strItr<char> iterator;
+  typedef strItr<const char> const_iterator;
+
   String();
   ~String();
   String(const String& rhs);
@@ -33,6 +38,11 @@ public:
   int capacity() const;
   void shrink_to_fit();
   void push_back(char c);
+
+  iterator begin();
+  iterator end();
+  const_iterator cbegin() const;
+  const_iterator cend() const;
 
   friend bool operator==(const String& lhs, const String& rhs);
   friend bool operator!=(const String& lhs, const String& rhs);

@@ -10,8 +10,11 @@
 #include <algorithm>
 #include <numeric>
 #include <forward_list>
+#include <string>
 
 using namespace std;
+
+#define VG
 
 namespace Tests
 {
@@ -83,91 +86,96 @@ namespace Tests
   }
   void TestString()
   {
-    //String a("char");
-    //assert(a == "char");
-    //String b(a);
-    //assert(b == "char");
-    //assert(b.size() == 4);
-    //String c(a + b);
-    //assert(c == "charchar");
-    //cout << c << endl;
-    //b = c;
-    //assert(b == "charchar");
-    //b = "Hello";
-    //assert(c == "charchar");
-    //a = '!';
-    //assert(a == "!");
-    //c = b + a + " Hi";
-    //assert(c == "Hello! Hi");
-    //cout << c << endl;
-    //c += a;
-    //c += "..?";
-    //assert(c == "Hello! Hi!..?");
-    //cout << c << endl;
-    //c[9] = '.';
-    //c.at(c.size() - 1) = '!';
-    //assert(c == "Hello! Hi...!");
-    //cout << c << endl;
-    //try {
-    //  char x = c.at(21);
-    //}
-    //catch (const out_of_range& oor)
-    //{
-    //  cout << "Index out of range: " << oor.what() << endl;
-    //}
-    //assert(c == "Hello! Hi...!");
-    //cout << c << endl;
+    String a("char");
+    assert(a == "char");
+    String b(a);
+    assert(b == "char");
+    assert(b.size() == 4);
+    String c(a + b);
+    assert(c == "charchar");
+    cout << c << endl;
+    b = c;
+    assert(b == "charchar");
+    b = "Hello";
+    assert(c == "charchar");
+    a = '!';
+    assert(a == "!");
+    c = b + a + " Hi";
+    assert(c == "Hello! Hi");
+    cout << c << endl;
+    c += a;
+    c += "..?";
+    assert(c == "Hello! Hi!..?");
+    cout << c << endl;
+    c[9] = '.';
+    c.at(c.size() - 1) = '!';
+    assert(c == "Hello! Hi...!");
+    cout << c << endl;
+    try {
+      char x = c.at(21);
+    }
+    catch (const out_of_range& oor)
+    {
+      cout << "Index out of range: " << oor.what() << endl;
+    }
+    assert(c == "Hello! Hi...!");
+    cout << c << endl;
 
-    //const char* d = c.data();
-    //cout << d << endl;
-    //assert(d == c);
-    //c = "12345";
-    //c.reserve(50);
-    //assert(c.capacity() == 50);
-    //c.push_back('!');
-    //assert(c == "12345!");
-    //c.shrink_to_fit();
-    //cout << "String: '" << c << '\'' << endl;
-    //cout << "Size: " << c.size() << endl;
-    //cout << "Capacity: " << c.capacity() << endl;
+    const char* d = c.data();
+    cout << d << endl;
+    assert(d == c);
+    c = "12345";
+    c.reserve(50);
+    assert(c.capacity() == 50);
+    c.push_back('!');
+    assert(c == "12345!");
+    c.shrink_to_fit();
+    cout << "String: '" << c << '\'' << endl;
+    cout << "Size: " << c.size() << endl;
+    cout << "Capacity: " << c.capacity() << endl;
 
-    //c.resize(5);
-    //assert(c == "12345");
-    //c.push_back('!');
-    //cout << "String: '" << c << '\'' << endl;
-    //cout << "Size: " << c.size() << endl;
-    //cout << "Capacity: " << c.capacity() << endl;
+    c.resize(5);
+    assert(c == "12345");
+    c.push_back('!');
+    cout << "String: '" << c << '\'' << endl;
+    cout << "Size: " << c.size() << endl;
+    cout << "Capacity: " << c.capacity() << endl;
 
-    //const String str = "boohoo";
-    ////str.at(0) = 'a';  // compiler error
-    ////str[0] = 'a';     // compiler error
-    ////char& ch = str[0];// compiler error
+    const String str = "boohoo";
+    //str.at(0) = 'a';  // compiler error
+    //str[0] = 'a';     // compiler error
+    //char& ch = str[0];// compiler error
 
-    //String str2("");
-    //assert(str2.size() == 0);
-    //str2 += "";
-    //assert(str2 == "");
+    String str2("");
+    assert(str2.size() == 0);
+    str2 += "";
+    assert(str2 == "");
 
-    //for (int i = 0; i < 1000; i++)
-    //  str2.push_back('0');
-    //cout << "Number of chars copied: " << g_ops << endl;
+    for (int i = 0; i < 100; i++)
+      str2.push_back('\0');
+    str2.push_back('W');
+    a = str2;
+    cout << a << endl;
+    cout << str2 << endl;
 
-    //a = "hej";
-    //a.push_back('\0');
-    //a.push_back('\0');
-    //a.push_back('a');
-    //a.push_back('b');
-    //b = a;
-    //b.push_back('c');
-    //assert(a != b);
-    //cout << a << endl;
-    //cout << b << endl;
+    a = "hej";
+    a.push_back('\0');
+    a.push_back('\0');
+    a.push_back('a');
+    a.push_back('b');
+    b = a;
+    b.push_back('c');
+    assert(a != b);
+    cout << a << endl;
+    cout << b << endl;
 
     String x("bae");
     String y = x;
     x.reserve(10);
     y.resize(20);
     x.push_back('b');
+    y.push_back('b');
+    y.push_back('\0');
     y.push_back('b');
     cout << x << endl;
     cout << y << endl;
@@ -269,7 +277,7 @@ namespace Tests
     TestPushBackReallocation();
 
     cout << String("hej\n");
-    cout << "Om det står hej på föergående rad så är TestFöGodkänt klar\n";
+    cout << "Om det står hej på föregående rad så är TestFöGodkänt klar\n";
 
   }
   void TestStringVG() {
@@ -373,34 +381,44 @@ namespace Tests
     srand(time(NULL));
 
     // sort std::vector
+      //initialize
     std::vector<int> alg1;
     for (size_t i = 0; i < 25; i++)
       alg1.push_back(rand() % 100);
+      //print
     cout << "Initial std:vector<int>" << endl;
     for (size_t i = 0; i < 25; i++)
       cout << alg1[i] << '\t';
     cout << endl;
+      //sort
     std::sort(alg1.begin(), alg1.end());
+      //print
     cout << "Sorted std:vector<int>" << endl;
     for (size_t i = 0; i < 25; i++)
       cout << alg1[i] << '\t';
     cout << "\n\n\n";
+      //assert
     for (size_t i = 0; i < 24; i++)
       assert(alg1[i] <= alg1[i + 1]);
 
-    // sort int[]
+    // sort int
+      //initialize
     int alg2[25];
     iota(alg2, &alg2[25], 0);
     random_shuffle(alg2, &alg2[25]);
+      //print
     cout << "Initial int[]" << endl;
     for (size_t i = 0; i < 25; i++)
       cout << alg2[i] << '\t';
     cout << endl;
+      //sort
     std::sort(alg2, &alg2[25]);
+      //print
     cout << "Sorted int[]" << endl;
     for (size_t i = 0; i < 25; i++)
       cout << alg2[i] << '\t';
     cout << "\n\n\n";
+      //assert
     for (size_t i = 0; i < 24; i++)
       assert(alg2[i] <= alg2[i + 1]);
 
@@ -476,6 +494,16 @@ namespace Tests
       cout << *itr << '\t';
     }
     cout << "\n\n\n";
+  }
+
+  void TestStringItr()
+  {
+    const String str = "foobar2000";
+    String::const_iterator itr = str.cbegin();
+    cout << str << endl;
+    while(itr != str.cend())
+    cout << *(itr++) << endl;
+    
   }
 
 }

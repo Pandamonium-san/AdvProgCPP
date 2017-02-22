@@ -2,39 +2,39 @@
 #include "stdafx.h"
 #include "Link.h"
 
-template <class T>
-Link<T>::Link()
+template <class ValueType>
+Link<ValueType>::Link()
 {
   next = nullptr;
   prev = nullptr;
 }
 
-template<class T>
-T * Link<T>::Next()
+template<class ValueType>
+ValueType * Link<ValueType>::Next()
 {
-  return dynamic_cast<T*>(next);
+  return dynamic_cast<ValueType*>(next);
 }
 
-template<class T>
-const T * Link<T>::Next() const
+template<class ValueType>
+const ValueType * Link<ValueType>::Next() const
 {
-  return dynamic_cast<T*>(next);
+  return dynamic_cast<ValueType*>(next);
 }
 
-template<class T>
-T * Link<T>::Prev()
+template<class ValueType>
+ValueType * Link<ValueType>::Prev()
 {
-  return dynamic_cast<T*>(prev);
+  return dynamic_cast<ValueType*>(prev);
 }
 
-template<class T>
-const T * Link<T>::Prev() const
+template<class ValueType>
+const ValueType * Link<ValueType>::Prev() const
 {
-  return dynamic_cast<T*>(prev);
+  return dynamic_cast<ValueType*>(prev);
 }
 
-template<class T>
-T* Link<T>::InsertAfter(T * TToInsert)
+template<class ValueType>
+ValueType* Link<ValueType>::InsertAfter(ValueType * TToInsert)
 {
   next->prev = TToInsert;
   TToInsert->next = next;
@@ -43,8 +43,8 @@ T* Link<T>::InsertAfter(T * TToInsert)
   return TToInsert;
 }
 
-template<class T>
-T* Link<T>::InsertBefore(T * TToInsert)
+template<class ValueType>
+ValueType* Link<ValueType>::InsertBefore(ValueType * TToInsert)
 {
   prev->next = TToInsert;
   TToInsert->prev = prev;
@@ -53,10 +53,10 @@ T* Link<T>::InsertBefore(T * TToInsert)
   return TToInsert;
 }
 
-template<class T>
-T* Link<T>::DeleteAfter()
+template<class ValueType>
+ValueType* Link<ValueType>::DeleteAfter()
 {
-  T* deleted = Next();
+  ValueType* deleted = Next();
   if (deleted == nullptr)
     return nullptr;
   next = next->next;
@@ -64,10 +64,10 @@ T* Link<T>::DeleteAfter()
   return deleted;
 }
 
-template<class T>
-T * Link<T>::DeleteBefore()
+template<class ValueType>
+ValueType * Link<ValueType>::DeleteBefore()
 {
-  T* deleted = Prev();
+  ValueType* deleted = Prev();
   if (deleted == nullptr)
     return nullptr;
   prev = prev->prev;
@@ -75,11 +75,11 @@ T * Link<T>::DeleteBefore()
   return deleted;
 }
 
-template<class T>
+template<class ValueType>
 template<class X>
-T * Link<T>::Find(const X & searchFor)
+ValueType * Link<ValueType>::Find(const X & searchFor)
 {
-  for (T* it = Next(); it != nullptr; it = it->Next())
+  for (ValueType* it = Next(); it != nullptr; it = it->Next())
   {
     if (*it == searchFor)
       return it;
@@ -87,11 +87,11 @@ T * Link<T>::Find(const X & searchFor)
   return nullptr;
 }
 
-template<class T>
+template<class ValueType>
 template<class X>
-const T * Link<T>::Find(const X& searchFor) const
+const ValueType * Link<ValueType>::Find(const X& searchFor) const
 {
-  for (const T* it = Next(); it != nullptr; it = it->Next())
+  for (const ValueType* it = Next(); it != nullptr; it = it->Next())
   {
     if (*it == searchFor)
       return it;

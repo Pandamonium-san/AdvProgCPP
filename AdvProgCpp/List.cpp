@@ -3,18 +3,18 @@
 #include "List.h"
 #include "Link.cpp"
 
-template<class T>
-List<T>::List()
+template<class ValueType>
+List<ValueType>::List()
 {
   next = this;
   prev = this;
 }
 
-template<class T>
-List<T>::~List()
+template<class ValueType>
+List<ValueType>::~List()
 {
-  T* next2;
-  for (T* it = Next(); it != nullptr;)
+  ValueType* next2;
+  for (ValueType* it = Next(); it != nullptr;)
   {
     next2 = it->Next();
     delete it;
@@ -22,51 +22,51 @@ List<T>::~List()
   }
 }
 
-template<class T>
-T * List<T>::First() 
+template<class ValueType>
+ValueType * List<ValueType>::First() 
 {
-  return dynamic_cast<T*>(next);
+  return dynamic_cast<ValueType*>(next);
 }
 
-template<class T>
-const T * List<T>::First() const
+template<class ValueType>
+const ValueType * List<ValueType>::First() const
 {
-  return dynamic_cast<T*>(next);
+  return dynamic_cast<ValueType*>(next);
 }
 
-template<class T>
-T * List<T>::Last() 
+template<class ValueType>
+ValueType * List<ValueType>::Last() 
 {
-  return dynamic_cast<T*>(prev);
+  return dynamic_cast<ValueType*>(prev);
 }
 
-template<class T>
-const T * List<T>::Last() const
+template<class ValueType>
+const ValueType * List<ValueType>::Last() const
 {
-  return dynamic_cast<T*>(prev);
+  return dynamic_cast<ValueType*>(prev);
 }
 
-template<class T>
-T* List<T>::InsertFirst(T* item)
+template<class ValueType>
+ValueType* List<ValueType>::InsertFirst(ValueType* item)
 {
   return InsertAfter(item);
 }
 
-template<class T>
-T* List<T>::PopFirst()
+template<class ValueType>
+ValueType* List<ValueType>::PopFirst()
 {
   return DeleteAfter();
 }
 
-template<class T>
-T* List<T>::InsertLast(T* item)
+template<class ValueType>
+ValueType* List<ValueType>::InsertLast(ValueType* item)
 {
   return InsertBefore(item);
 }
 
-template<class T>
-void List<T>::Check() const {
-  const Link<T> *node = this, *nextNode = next;
+template<class ValueType>
+void List<ValueType>::Check() const {
+  const Link<ValueType> *node = this, *nextNode = next;
   do {
     assert(node->next == nextNode && nextNode->prev == node);
     node = nextNode;
@@ -74,10 +74,10 @@ void List<T>::Check() const {
   } while (node != this);
 }
 
-template<class T>
-std::ostream & List<T>::Print(std::ostream & cout) const
+template<class ValueType>
+std::ostream & List<ValueType>::Print(std::ostream & cout) const
 {
-  for (const Link<T>* item = First(); item; item = item->Next())
+  for (const Link<ValueType>* item = First(); item; item = item->Next())
   {
     item->Print(cout) << ' ';
   }

@@ -1,25 +1,24 @@
 #include "stdafx.h"
 #include "String.h"
-
-int g_ops;
+#include <assert.h>
 
 String::String()
 {
-  m_begin = new char[4];
+  m_capacity = 3;
+  m_begin = new char[m_capacity + 1];
   m_end = m_begin;
   *m_end = '\0';
-  m_capacity = 3;
 }
-
 
 String::~String()
 {
+  assert(Invariant());
   delete m_begin;
 }
 
 String::String(const String & rhs)
 {
-  Copy(rhs);
+  Copy(rhs.m_begin, rhs.size(), false);
 }
 
 String::String(String && rhs)
@@ -33,13 +32,12 @@ String::String(String && rhs)
 
 String::String(const char * cstr)
 {
-  Copy(cstr);
+  Copy(cstr, strlen(cstr), false);
 }
 
 String::String(const char ch)
 {
   char* temp = new char[2]; // can throw
-  delete m_begin;
   this->m_capacity = 2;
   m_begin = temp;
   m_begin[0] = ch;
@@ -49,7 +47,9 @@ String::String(const char ch)
 
 String & String::operator=(const String & rhs)
 {
-  Copy(rhs);
+  if (*this == rhs)
+    return *this;
+  Copy(rhs.m_begin, rhs.size(), true);
   return *this;
 }
 
@@ -60,6 +60,7 @@ String & String::operator=(String && rhs)
   m_end = rhs.m_end;
   m_capacity = rhs.m_capacity;
   rhs.m_begin = nullptr;
+  rhs.m_end = nullptr;
   return *this;
 }
 
@@ -104,10 +105,7 @@ const char * String::data() const
 
 int String::size() const
 {
-  int size = 0;
-  for (const char* itr = m_begin; itr != m_end; itr++)
-    ++size;
-  return size;
+  return m_end - m_begin;
 }
 
 void String::reserve(size_t n)
@@ -118,7 +116,7 @@ void String::reserve(size_t n)
     return;
   }
 
-  char* temp = (char*)malloc(sizeof(char)*n + 1);
+  char* temp = new char[n + 1];
   temp[n] = '\0';
   m_capacity = n;
 
@@ -132,6 +130,7 @@ void String::reserve(size_t n)
   m_end = &temp[i];
   *m_end = '\0';
   m_begin = temp;
+  assert(Invariant());
 }
 
 void String::resize(size_t n)
@@ -144,11 +143,12 @@ void String::resize(size_t n)
   const char* itr = m_begin;
   while (i < n && itr != m_end)
   {
-     temp[i++] = *itr++;
+    temp[i++] = *itr++;
   }
   delete m_begin;
   m_end = &temp[n];
   m_begin = temp;
+  assert(Invariant());
 }
 
 int String::capacity() const
@@ -168,11 +168,30 @@ void String::push_back(char c)
   if (len == m_capacity)
   {
     reserve(1 + len * 2);
-    g_ops += len;
   }
-  m_begin[len] = c;
-  m_begin[len + 1] = '\0';
-  m_end++;
+  *m_end = c;
+  *(++m_end) = '\0';
+  assert(Invariant());
+}
+
+String::iterator String::begin()
+{
+  return iterator(m_begin);
+}
+
+String::iterator String::end()
+{
+  return iterator(m_end);
+}
+
+String::const_iterator String::cbegin() const
+{
+  return const_iterator(m_begin);
+}
+
+String::const_iterator String::cend() const
+{
+  return const_iterator(m_end);
 }
 
 bool operator==(const String & lhs, const String & rhs)
@@ -219,39 +238,30 @@ std::ostream & operator<<(std::ostream & cout, const String & str)
   return cout;
 }
 
-void String::Copy(const char * from)
+void String::Copy(const char * from, int len, bool remove)
 {
-  int cap = strlen(from) + 1;
+  int cap = len + 1;
   if (m_capacity < cap)
   {
     char* temp = new char[cap]; // can throw
-    delete m_begin;
+    if (remove)
+      delete m_begin;
     m_begin = temp;
     this->m_capacity = cap - 1;
   }
+
   int i = 0;
-  for (const char* itr = from; *itr != '\0'; itr++)
+  for (const char* itr = from; itr != from + len; itr++)
   {
     m_begin[i++] = *itr;
   }
   m_begin[i] = '\0';
   m_end = &m_begin[i];
+
+  assert(Invariant());
 }
 
-void String::Copy(const String& from)
+bool String::Invariant() const
 {
-  if (m_capacity < from.m_capacity)
-  {
-    char* temp = new char[from.m_capacity + 1]; // can throw
-    delete m_begin;
-    m_begin = temp;
-    this->m_capacity = from.m_capacity;
-  }
-  int i = 0;
-  for (const char* itr = from.m_begin; itr != from.m_end; itr++)
-  {
-    m_begin[i++] = *itr;
-  }
-  m_begin[i] = '\0';
-  m_end = &m_begin[i];
+  return (m_end == nullptr || *m_end == '\0') && (m_end - m_begin) <= m_capacity;
 }

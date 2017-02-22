@@ -1,6 +1,5 @@
 #pragma once
 #include <assert.h>
-#define VG
 
 namespace Tests 
 {
@@ -12,4 +11,6 @@ namespace Tests
   extern void TestAlgorithmsUppg1();
   extern void TestAlgorithmsUppg2();
   extern void TestAlgorithmsUppg3();
+
+  extern void TestStringItr();
 }

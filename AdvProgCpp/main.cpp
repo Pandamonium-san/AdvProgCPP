@@ -21,12 +21,13 @@ int main()
   _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
   //TestDLL();
-  //TestString();
-  //TestStringG();
-  //TestStringVG();
-  TestAlgorithmsUppg1();
+  /*TestString();
+  TestStringG();
+  TestStringVG();*/
+  /*TestAlgorithmsUppg1();
   TestAlgorithmsUppg2();
-  TestAlgorithmsUppg3();
+  TestAlgorithmsUppg3();*/
+  TestStringItr();
 
   std::cin.get();
   return 0;

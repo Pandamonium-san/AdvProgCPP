@@ -43,7 +43,7 @@ namespace Algorithms
       for (FwdItr itr = begin; itr != end; itr++)
       {
         FwdItr current = itr;
-        if (*current > *prev)
+        if (*current < *prev)
         {
           std::swap(*current, *prev);
           modified = true;

@@ -1,21 +1,21 @@
 #pragma once
 #include "Link.h"
 
-template <class T>
-class List : public Link<T>{
-  friend class Link<T>;
+template <class ValueType>
+class List : public Link<ValueType>{
+  friend class Link<ValueType>;
 public:
   List();
   ~List();
-  T * First() ;
-  const T * First() const;
-  T * Last() ;
-  const T * Last() const;
-  T * InsertFirst(T* item);
-  T * PopFirst();
-  T * InsertLast(T* item);
+  ValueType * First() ;
+  const ValueType * First() const;
+  ValueType * Last() ;
+  const ValueType * Last() const;
+  ValueType * InsertFirst(ValueType* item);
+  ValueType * PopFirst();
+  ValueType * InsertLast(ValueType* item);
 
-  friend std::ostream& operator<<(std::ostream& cout, List<T>& list) {
+  friend std::ostream& operator<<(std::ostream& cout, List<ValueType>& list) {
     return list.Print(cout);
   }
   void Check() const;
