@@ -14,6 +14,8 @@ class String
 public:
   typedef strItr<char> iterator;
   typedef strItr<const char> const_iterator;
+  typedef r_strItr<char> reverse_iterator;
+  typedef r_strItr<const char> const_reverse_iterator;
 
   String();
   ~String();
@@ -32,10 +34,10 @@ public:
   char& operator[](size_t i);
   const char& operator[](size_t i) const;
   const char* data() const;
-  int size() const;
+  size_t size() const;
   void reserve(size_t n);
   void resize(size_t n);
-  int capacity() const;
+  size_t capacity() const;
   void shrink_to_fit();
   void push_back(char c);
 
@@ -43,6 +45,11 @@ public:
   iterator end();
   const_iterator cbegin() const;
   const_iterator cend() const;
+
+  reverse_iterator rbegin();
+  reverse_iterator rend();
+  const_reverse_iterator crbegin() const;
+  const_reverse_iterator crend() const;
 
   friend bool operator==(const String& lhs, const String& rhs);
   friend bool operator!=(const String& lhs, const String& rhs);

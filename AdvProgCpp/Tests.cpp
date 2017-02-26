@@ -6,7 +6,6 @@
 #include "String.h"
 #include "Algorithms.h"
 #include <vector>
-#include <time.h>
 #include <algorithm>
 #include <numeric>
 #include <forward_list>
@@ -378,26 +377,24 @@ namespace Tests
 
   void TestAlgorithmsUppg1()
   {
-    srand(time(NULL));
-
     // sort std::vector
       //initialize
     std::vector<int> alg1;
     for (size_t i = 0; i < 25; i++)
       alg1.push_back(rand() % 100);
-      //print
+    //print
     cout << "Initial std:vector<int>" << endl;
     for (size_t i = 0; i < 25; i++)
       cout << alg1[i] << '\t';
     cout << endl;
-      //sort
+    //sort
     std::sort(alg1.begin(), alg1.end());
-      //print
+    //print
     cout << "Sorted std:vector<int>" << endl;
     for (size_t i = 0; i < 25; i++)
       cout << alg1[i] << '\t';
     cout << "\n\n\n";
-      //assert
+    //assert
     for (size_t i = 0; i < 24; i++)
       assert(alg1[i] <= alg1[i + 1]);
 
@@ -406,19 +403,19 @@ namespace Tests
     int alg2[25];
     iota(alg2, &alg2[25], 0);
     random_shuffle(alg2, &alg2[25]);
-      //print
+    //print
     cout << "Initial int[]" << endl;
     for (size_t i = 0; i < 25; i++)
       cout << alg2[i] << '\t';
     cout << endl;
-      //sort
+    //sort
     std::sort(alg2, &alg2[25]);
-      //print
+    //print
     cout << "Sorted int[]" << endl;
     for (size_t i = 0; i < 25; i++)
       cout << alg2[i] << '\t';
     cout << "\n\n\n";
-      //assert
+    //assert
     for (size_t i = 0; i < 24; i++)
       assert(alg2[i] <= alg2[i + 1]);
 
@@ -456,7 +453,6 @@ namespace Tests
   }
   void TestAlgorithmsUppg2()
   {
-    srand(time(NULL));
     std::vector<int> cont;
     for (size_t i = 0; i < 25; i++)
       cont.push_back(rand() % 100);
@@ -476,10 +472,9 @@ namespace Tests
   }
   void TestAlgorithmsUppg3()
   {
-    srand(23);
     forward_list<int> fl;
     for (size_t i = 0; i < 25; i++)
-      fl.push_front(rand()%100);
+      fl.push_front(rand() % 100);
 
     cout << "Initial forward list" << endl;
     for (forward_list<int>::iterator itr = fl.begin(); itr != fl.end(); itr++)
@@ -498,12 +493,159 @@ namespace Tests
 
   void TestStringItr()
   {
-    const String str = "foobar2000";
-    String::const_iterator itr = str.cbegin();
+    String str = "foobar2000";
+    String::const_reverse_iterator itr = str.crbegin();
     cout << str << endl;
-    while(itr != str.cend())
-    cout << *(itr++) << endl;
-    
+    while (itr != str.crend())
+      cout << *(itr++);
+    cout << endl;
+    std::random_shuffle(str.begin(), str.end());
+    cout << str << endl;
   }
 
+
+  void TestItt() {
+    //-	typdefs f iterator, const_iterator,  reverse_iterator och const_revers_iterator
+    String::iterator Str;
+    String::reverse_iterator rStr;
+
+    //-	funktionerna begin, end, cbegin, cend, rbegin, rend, crbegin och crend.
+
+    TestIttPart();
+    TestIttPartR();
+#ifdef VG
+    String::const_iterator cStr;
+    String::const_reverse_iterator crStr;
+    TestIttPartC();
+    TestIttPartCR();
+#endif VG
+    TestIttInAlg();
+    TestRevIttInAlg();
+
+    //-	default constructor, copy constructor och tilldelning (=) 
+    String s("foobar");
+    Str = s.begin();
+    rStr = s.rbegin();
+
+#ifdef VG
+    cStr = s.cbegin();
+    crStr = s.crbegin();
+#endif VG
+
+    *Str = 'a';
+    //	*(cStr+1)='b';	//Sak ge kompileringsfel!
+    *(rStr + 2) = 'c';
+    //	*(crStr+3)='d';	//Sak ge kompileringsfel!
+    assert(s == "aoocar");
+
+    cout << "\nTestItt G klar";
+#ifdef VG
+    cout << "\nTestItt VG klar\n";
+#endif VG
+  }
+
+  void TestIttInAlg() {
+
+    static const int N = 26;
+    String v;
+    v.reserve(N);
+    for (int i = 0; i < N; ++i) {
+      v.push_back('a' + i);
+    }
+    v.begin();
+    auto b = std::begin(v);
+    auto e = std::end(v);
+
+    std::random_shuffle(b, e);
+
+    cout << v << endl;
+    std::stable_sort(b, e);
+
+    cout << v << endl;
+    assert(v == "abcdefghijklmnopqrstuvwxyz");
+  }
+
+  void TestRevIttInAlg() {
+
+    static const int N = 26;
+    String v;
+    v.reserve(N);
+    for (int i = 0; i < N; ++i) {
+      v.push_back('a' + i);
+    }
+    auto b = std::rbegin(v);
+    auto e = std::rend(v);
+
+    std::random_shuffle(b, e);
+
+    cout << v << endl;
+    std::stable_sort(b, e);
+
+    cout << v << endl;
+
+  }
+
+  /*	*it, ++it, it++, (it+i), it[i], == och !=	*/
+  void TestIttPart() {
+    String s1("foobar");
+    for (auto i = s1.begin(); i != s1.end(); i++)
+      cout << *i;
+    cout << endl;
+    //    s1 = "raboof";
+    auto it = s1.begin();
+    assert(*it == 'f');
+    assert(*(it++) == 'f' && *it == 'o');
+    ++it;
+    assert(*++it == 'b');
+    assert(*(it + 1) == 'a');
+    assert(it[2] == 'r');
+  }
+
+  void TestIttPartR() {
+    String s1("foobar");
+    for (auto i = s1.rbegin(); i != s1.rend(); i++)
+      cout << *i;
+    cout << endl;
+    s1 = "raboof";
+    auto it = s1.rbegin();
+    assert(*it == 'f');
+
+    assert(*(it++) == 'f' && *it == 'o');
+    ++it;
+    assert(*++it == 'b');
+    assert(*(it + 1) == 'a');
+    assert(it[2] == 'r');
+  }
+
+#ifdef VG
+  void TestIttPartC() {
+    String s1("foobar");
+    for (auto i = s1.cbegin(); i != s1.cend(); i++)
+      cout << *i;
+    cout << endl;
+    //    s1 = "raboof";
+    auto it = s1.cbegin();
+    assert(*it == 'f');
+    assert(*(it++) == 'f' && *it == 'o');
+    ++it;
+    assert(*++it == 'b');
+    assert(*(it + 1) == 'a');
+    assert(it[2] == 'r');
+  }
+
+  void TestIttPartCR() {
+    String s1("foobar");
+    for (auto i = s1.crbegin(); i != s1.crend(); i++)
+      cout << *i;
+    cout << endl;
+    s1 = "raboof";
+    auto it = s1.crbegin();
+    assert(*it == 'f');
+    assert(*(it++) == 'f' && *it == 'o');
+    ++it;
+    assert(*++it == 'b');
+    assert(*(it + 1) == 'a');
+    assert(it[2] == 'r');
+  }
+#endif VG
 }

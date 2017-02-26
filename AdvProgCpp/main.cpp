@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include <iostream>
-
+#include <time.h>
 #include "Tests.h"
 
 using namespace std;
@@ -19,7 +19,7 @@ using namespace Tests;
 int main()
 {
   _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-
+  srand(time(NULL));
   //TestDLL();
   /*TestString();
   TestStringG();
@@ -27,7 +27,8 @@ int main()
   /*TestAlgorithmsUppg1();
   TestAlgorithmsUppg2();
   TestAlgorithmsUppg3();*/
-  TestStringItr();
+  //TestStringItr();
+  TestItt();
 
   std::cin.get();
   return 0;

@@ -103,7 +103,7 @@ const char * String::data() const
   return m_begin;
 }
 
-int String::size() const
+size_t String::size() const
 {
   return m_end - m_begin;
 }
@@ -120,7 +120,7 @@ void String::reserve(size_t n)
   temp[n] = '\0';
   m_capacity = n;
 
-  int i = 0;
+  size_t i = 0;
   const char* itr = m_begin;
   while (i < n && itr != m_end)
   {
@@ -139,7 +139,7 @@ void String::resize(size_t n)
   temp[n] = '\0';
   m_capacity = n;
 
-  int i = 0;
+  size_t i = 0;
   const char* itr = m_begin;
   while (i < n && itr != m_end)
   {
@@ -151,7 +151,7 @@ void String::resize(size_t n)
   assert(Invariant());
 }
 
-int String::capacity() const
+size_t String::capacity() const
 {
   return m_capacity;
 }
@@ -192,6 +192,26 @@ String::const_iterator String::cbegin() const
 String::const_iterator String::cend() const
 {
   return const_iterator(m_end);
+}
+
+String::reverse_iterator String::rbegin()
+{
+  return reverse_iterator(m_end - 1);
+}
+
+String::reverse_iterator String::rend()
+{
+  return reverse_iterator(m_begin - 1);
+}
+
+String::const_reverse_iterator String::crbegin() const
+{
+  return const_reverse_iterator(m_end - 1);
+}
+
+String::const_reverse_iterator String::crend() const
+{
+  return const_reverse_iterator(m_begin - 1);
 }
 
 bool operator==(const String & lhs, const String & rhs)

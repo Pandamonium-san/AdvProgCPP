@@ -3,14 +3,23 @@
 
 namespace Tests 
 {
-  extern void TestDLL();
-  extern void TestString();
-  extern void TestPushBackReallocation();
-  extern void TestStringG();
-  extern void TestStringVG();
-  extern void TestAlgorithmsUppg1();
-  extern void TestAlgorithmsUppg2();
-  extern void TestAlgorithmsUppg3();
+  void TestDLL();
 
-  extern void TestStringItr();
+  void TestString();
+  void TestPushBackReallocation();
+  void TestStringG();
+  void TestStringVG();
+
+  void TestAlgorithmsUppg1();
+  void TestAlgorithmsUppg2();
+  void TestAlgorithmsUppg3();
+
+  void TestStringItr();
+  void TestItt();
+  void TestIttPart();
+  void TestIttPartR();
+  void TestIttPartC();
+  void TestIttPartCR();
+  void TestIttInAlg();
+  void TestRevIttInAlg();
 }
