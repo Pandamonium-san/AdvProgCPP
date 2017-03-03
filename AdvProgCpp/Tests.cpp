@@ -494,16 +494,17 @@ namespace Tests
   void TestStringItr()
   {
     String str = "foobar2000";
-    String::const_reverse_iterator itr = str.crbegin();
+    String::const_iterator itr = str.begin();   //iterator->const_iterator conversion
+    //String::iterator itr2 = str.cbegin();     //const_iterator->iterator conversion compile error
+    String::const_reverse_iterator itr3 = str.rbegin();
+    //String::reverse_iterator itr4 = str.crbegin();
     cout << str << endl;
-    while (itr != str.crend())
+    while (itr != str.end())
       cout << *(itr++);
     cout << endl;
     std::random_shuffle(str.begin(), str.end());
     cout << str << endl;
   }
-
-
   void TestItt() {
     //-	typdefs f iterator, const_iterator,  reverse_iterator och const_revers_iterator
     String::iterator Str;
@@ -582,7 +583,7 @@ namespace Tests
     std::stable_sort(b, e);
 
     cout << v << endl;
-
+    assert(v == "zyxwvutsrqponmlkjihgfedcba");
   }
 
   /*	*it, ++it, it++, (it+i), it[i], == och !=	*/
