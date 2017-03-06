@@ -22,4 +22,7 @@ namespace Tests
   void TestIttPartCR();
   void TestIttInAlg();
   void TestRevIttInAlg();
+
+  void TestSharedPtr();
+  void TestSharedPtrVG();
 }

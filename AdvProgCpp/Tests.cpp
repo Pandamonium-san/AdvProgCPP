@@ -5,6 +5,7 @@
 #include "Node.cpp"
 #include "String.h"
 #include "Algorithms.h"
+#include "SharedPtr.h"
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -81,7 +82,6 @@ namespace Tests
     myList.Check();
 
     std::cout << "DLL test passed" << endl << endl;
-    std::cin.get();
   }
   void TestString()
   {
@@ -202,7 +202,7 @@ namespace Tests
     auto internalBuf = str.data();
     auto cap = str.capacity();
     auto siz = str.size();
-    int i;
+    unsigned int i;
     for (i = siz + 1; i <= cap; ++i) {
       str.push_back(char(i) + 'a');
       assert(internalBuf == str.data());
@@ -503,7 +503,6 @@ namespace Tests
     cout << str << endl;
   }
 
-
   void TestItt() {
     //-	typdefs f iterator, const_iterator,  reverse_iterator och const_revers_iterator
     String::iterator Str;
@@ -543,7 +542,6 @@ namespace Tests
     cout << "\nTestItt VG klar\n";
 #endif VG
   }
-
   void TestIttInAlg() {
 
     static const int N = 26;
@@ -564,7 +562,6 @@ namespace Tests
     cout << v << endl;
     assert(v == "abcdefghijklmnopqrstuvwxyz");
   }
-
   void TestRevIttInAlg() {
 
     static const int N = 26;
@@ -584,7 +581,6 @@ namespace Tests
     cout << v << endl;
 
   }
-
   /*	*it, ++it, it++, (it+i), it[i], == och !=	*/
   void TestIttPart() {
     String s1("foobar");
@@ -600,7 +596,6 @@ namespace Tests
     assert(*(it + 1) == 'a');
     assert(it[2] == 'r');
   }
-
   void TestIttPartR() {
     String s1("foobar");
     for (auto i = s1.rbegin(); i != s1.rend(); i++)
@@ -616,7 +611,6 @@ namespace Tests
     assert(*(it + 1) == 'a');
     assert(it[2] == 'r');
   }
-
 #ifdef VG
   void TestIttPartC() {
     String s1("foobar");
@@ -632,7 +626,6 @@ namespace Tests
     assert(*(it + 1) == 'a');
     assert(it[2] == 'r');
   }
-
   void TestIttPartCR() {
     String s1("foobar");
     for (auto i = s1.crbegin(); i != s1.crend(); i++)
@@ -648,4 +641,62 @@ namespace Tests
     assert(it[2] == 'r');
   }
 #endif VG
+  
+  struct C {
+    float value;
+    C(float value) :value(value) {};
+  };
+
+  void TestSharedPtr() {
+    SharedPtr<C> sp;
+    assert(!sp);
+    SharedPtr<C> sp2(nullptr);
+    assert(!sp2);
+    SharedPtr<C> sp3(new C(3));
+    assert(sp3);
+
+    assert(sp3.unique());
+    SharedPtr<C> sp4(sp3);
+    assert(sp4);
+    assert(!sp3.unique());
+    
+    sp4 = sp3;
+    assert(sp4);
+
+    sp4 = sp4;
+    assert(sp4);
+
+    SharedPtr<C> sp5(new C(31));
+    assert(sp == nullptr);
+    assert(sp < sp3);
+    assert(!(sp3 < sp));
+    assert(sp4 == sp3);
+    assert(!(sp4 == sp5));
+    assert((sp4 < sp5) || (sp5 < sp4));
+
+    SharedPtr<C> sp41(new C(41));
+    SharedPtr<C> sp42(new C(42));
+    assert((sp41->value) == (sp41.get()->value));
+    assert((sp41->value) != (sp42.get()->value));
+    assert(&(*sp41) == (sp41.get()));
+
+    //move
+    SharedPtr<C> sp51(std::move(sp41));
+    assert(sp51->value == 41);
+    assert(!sp41);
+
+    sp51.reset();
+    assert(!sp51);
+    sp51.reset();
+    SharedPtr<C> sp91(new C(11));
+    for (size_t i = 0; i < 100; i++)
+    {
+      SharedPtr<C> shptr(SharedPtr<C>(sp91));
+    }
+    sp91 = SharedPtr<C>();
+  }
+  void TestSharedPtrVG() 
+  {
+
+  }
 }

@@ -20,15 +20,18 @@ int main()
 {
   _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
   srand(time(NULL));
+  
   //TestDLL();
-  /*TestString();
-  TestStringG();
-  TestStringVG();*/
-  /*TestAlgorithmsUppg1();
-  TestAlgorithmsUppg2();
-  TestAlgorithmsUppg3();*/
+  //TestString();
+  //TestStringG();
+  //TestStringVG();
+  //TestAlgorithmsUppg1();
+  //TestAlgorithmsUppg2();
+  //TestAlgorithmsUppg3();
   //TestStringItr();
-  TestItt();
+  //TestItt();
+  
+  TestSharedPtr();
 
   std::cin.get();
   return 0;

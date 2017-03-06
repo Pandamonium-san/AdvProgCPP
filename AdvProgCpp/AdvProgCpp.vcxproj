@@ -149,6 +149,7 @@
     <ClInclude Include="Link.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="SharedPtr.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="StringItr.h" />
