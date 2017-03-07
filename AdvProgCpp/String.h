@@ -13,10 +13,14 @@ class String
   inline void Copy(const char* from, int len, bool remove);
   bool Invariant() const;
 public:
-  typedef strItr<char> iterator;
+  typedef baseItr<char, 1> iterator;
+  typedef baseItr<const char, 1> const_iterator;
+  typedef baseItr<char, -1> reverse_iterator;
+  typedef baseItr<const char, -1> const_reverse_iterator;
+  /*typedef strItr<char> iterator;
   typedef strItr<const char> const_iterator;
   typedef r_strItr<char> reverse_iterator;
-  typedef r_strItr<const char> const_reverse_iterator;
+  typedef r_strItr<const char> const_reverse_iterator;*/
 
   String();
   ~String();

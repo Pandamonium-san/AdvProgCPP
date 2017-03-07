@@ -81,7 +81,6 @@ namespace Tests
     myList.Check();
 
     std::cout << "DLL test passed" << endl << endl;
-    std::cin.get();
   }
   void TestString()
   {
@@ -202,7 +201,7 @@ namespace Tests
     auto internalBuf = str.data();
     auto cap = str.capacity();
     auto siz = str.size();
-    int i;
+    size_t i;
     for (i = siz + 1; i <= cap; ++i) {
       str.push_back(char(i) + 'a');
       assert(internalBuf == str.data());
@@ -498,6 +497,9 @@ namespace Tests
     //String::iterator itr2 = str.cbegin();     //const_iterator->iterator conversion compile error
     String::const_reverse_iterator itr3 = str.rbegin();
     //String::reverse_iterator itr4 = str.crbegin();
+    if (itr > str.begin())
+      cout << *itr << endl;
+    cout << *itr << endl;
     cout << str << endl;
     while (itr != str.end())
       cout << *(itr++);
@@ -506,7 +508,7 @@ namespace Tests
     cout << str << endl;
   }
   void TestItt() {
-    //-	typdefs f iterator, const_iterator,  reverse_iterator och const_revers_iterator
+    //-	typdefs f iterator, const_iterator,  reverse_iterator och const_revers_iterator
     String::iterator Str;
     String::reverse_iterator rStr;
 
@@ -592,7 +594,6 @@ namespace Tests
     for (auto i = s1.begin(); i != s1.end(); i++)
       cout << *i;
     cout << endl;
-    //    s1 = "raboof";
     auto it = s1.begin();
     assert(*it == 'f');
     assert(*(it++) == 'f' && *it == 'o');
@@ -624,7 +625,6 @@ namespace Tests
     for (auto i = s1.cbegin(); i != s1.cend(); i++)
       cout << *i;
     cout << endl;
-    //    s1 = "raboof";
     auto it = s1.cbegin();
     assert(*it == 'f');
     assert(*(it++) == 'f' && *it == 'o');
