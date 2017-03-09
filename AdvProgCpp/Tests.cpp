@@ -700,6 +700,11 @@ namespace Tests
   }
   void TestSharedPtrVG() 
   {
-
+    WeakPtr<C> b;
+    {
+      SharedPtr<C> a(new C(4));
+      b = a;
+    }
+    assert(b.expired());
   }
 }

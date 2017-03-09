@@ -31,6 +31,7 @@ int main()
   //TestItt();
   
   TestSharedPtr();
+  TestSharedPtrVG();
 
   std::cin.get();
   return 0;

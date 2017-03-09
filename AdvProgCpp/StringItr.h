@@ -20,7 +20,6 @@ public:
   bool operator==(const baseItr& rhs) const { return m_ptr == rhs.m_ptr; }
   bool operator!=(const baseItr& rhs) const { return m_ptr != rhs.m_ptr; }
   ValueType& operator*() const { return *m_ptr; }
-  //const ValueType& operator*() const { return *m_ptr; }
 
   baseItr& operator+=(ptrdiff_t i) { m_ptr += i*step; return *this; }
   baseItr& operator-=(ptrdiff_t i) { m_ptr -= i*step; return *this; }
@@ -33,7 +32,6 @@ public:
   ptrdiff_t operator-(const baseItr& rhs) const { return (this->m_ptr - rhs.m_ptr) * step; }
 
   ValueType& operator[](ptrdiff_t i) const { return *(m_ptr + i * step); }
-  //const ValueType& operator[](ptrdiff_t i) const { return *(m_ptr + i * step); }
   operator baseItr<ValueType const, step>() const { return baseItr<ValueType const, step>(m_ptr); }
   bool operator<(const baseItr& rhs) const { return (m_ptr - rhs.m_ptr)*step < 0; }
   bool operator>(const baseItr& rhs) const { return (m_ptr - rhs.m_ptr)*step > 0; }
