@@ -69,7 +69,6 @@ SharedPtr<T>& SharedPtr<T>::operator=(SharedPtr<T>&& rhs)
   SharedPtr<T>(std::move(rhs)).swap(*this);
   return *this;
 }
-
 template<class T>
 void SharedPtr<T>::swap(SharedPtr<T>& other)
 {
@@ -84,4 +83,79 @@ template<class T>
 void SharedPtr<T>::reset(T* ptr = nullptr)
 {
   SharedPtr<T>(ptr).swap(*this);
+}
+
+
+template<class T>
+WeakPtr<T>::WeakPtr()
+{
+  m_ptr = nullptr;
+  m_counter = nullptr;
+}
+template<class T>
+template<class U>
+WeakPtr<T>::WeakPtr(const SharedPtr<U>& ptr)
+{
+  m_ptr = ptr.m_ptr;
+  m_counter = ptr.m_counter;
+  if (m_counter != nullptr)
+    m_counter->AddWeak();
+}
+template<class T>
+template<class U>
+WeakPtr<T>::WeakPtr(const WeakPtr<U>& ptr)
+{
+  m_ptr = ptr.m_ptr;
+  m_counter = ptr.m_counter;
+  if (m_counter != nullptr)
+    m_counter->AddWeak();
+}
+template<class T>
+WeakPtr<T>::~WeakPtr()
+{
+  if (m_counter != nullptr)
+    m_counter->ReleaseWeak();
+}
+template<class T>
+template<class U>
+WeakPtr<T>& WeakPtr<T>::operator=(const SharedPtr<U>& ptr)
+{
+  if (m_counter != nullptr)
+    m_counter->ReleaseWeak();
+  m_ptr = ptr.m_ptr;
+  m_counter = ptr.m_counter;
+  if (m_counter != nullptr)
+    m_counter->AddWeak();
+  return *this;
+}
+template<class T>
+WeakPtr<T>& WeakPtr<T>::operator=(const WeakPtr& ptr)
+{
+  if (m_counter != nullptr)
+    m_counter->ReleaseWeak();
+  m_ptr = ptr.m_ptr;
+  m_counter = ptr.m_counter;
+  if (m_counter != nullptr)
+    m_counter->AddWeak();
+  return *this;
+}
+template<class T>
+bool WeakPtr<T>::expired() const
+{
+  if (m_counter == nullptr)
+    return true;
+  if (m_counter->UseCount() == 0) {
+    return true;
+  }
+  return false;
+}
+template<class T>
+SharedPtr<T> WeakPtr<T>::lock() const
+{
+  if (expired()) {
+    return SharedPtr<T>();
+  }
+  else {
+    return SharedPtr<T>(*this);
+  }
 }

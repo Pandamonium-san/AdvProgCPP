@@ -644,10 +644,13 @@ namespace Tests
     assert(it[2] == 'r');
   }
 #endif VG
-  
+
   struct C {
     float value;
     C(float value) :value(value) {};
+  };
+  struct D : C {
+    D(float value) :C(value) { }
   };
   void TestSharedPtr() {
     SharedPtr<C> sp;
@@ -661,7 +664,7 @@ namespace Tests
     SharedPtr<C> sp4(sp3);
     assert(sp4);
     assert(!sp3.unique());
-    
+
     sp4 = sp3;
     assert(sp4);
 
@@ -699,19 +702,6 @@ namespace Tests
   }
 #ifdef VG
   void TestSharedPtrVG() {
-    //SharedPtr<List<Node<int>>> c(new List<Node<int>>());
-    //WeakPtr<Link<Node<int>>> e;
-    //e = c;
-    //WeakPtr<List<Node<int>>> b;
-    //b = c;
-    //WeakPtr<Link<Node<int>>> d = b;
-    //{
-    //  SharedPtr<C> a(new C(4));
-    //  b = a;
-    //  //c = b.lock();
-    //}
-    //assert(!b.expired());
-
     //Weak pointer skall ha det som det står VG på nedan
     //-	Konstruktor som tar:		
     //	o	inget	G	VG
@@ -751,6 +741,7 @@ namespace Tests
     //Shared(weak)
     try {
       SharedPtr<C> slask(wp14);
+      assert(false);
     }
     catch (const char* const except) {
       assert(except == "std::bad_weak_ptr");
