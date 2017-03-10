@@ -5,7 +5,7 @@
 #include "Node.cpp"
 #include "String.h"
 #include "Algorithms.h"
-#include "SharedPtr.h"
+#include "SharedPtr.cpp"
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -649,7 +649,6 @@ namespace Tests
     float value;
     C(float value) :value(value) {};
   };
-
   void TestSharedPtr() {
     SharedPtr<C> sp;
     assert(!sp);
@@ -698,13 +697,85 @@ namespace Tests
     }
     sp91 = SharedPtr<C>();
   }
-  void TestSharedPtrVG() 
-  {
-    WeakPtr<C> b;
-    {
-      SharedPtr<C> a(new C(4));
-      b = a;
+#ifdef VG
+  void TestSharedPtrVG() {
+    //SharedPtr<List<Node<int>>> c(new List<Node<int>>());
+    //WeakPtr<Link<Node<int>>> e;
+    //e = c;
+    //WeakPtr<List<Node<int>>> b;
+    //b = c;
+    //WeakPtr<Link<Node<int>>> d = b;
+    //{
+    //  SharedPtr<C> a(new C(4));
+    //  b = a;
+    //  //c = b.lock();
+    //}
+    //assert(!b.expired());
+
+    //Weak pointer skall ha det som det står VG på nedan
+    //-	Konstruktor som tar:		
+    //	o	inget	G	VG
+    //	o	En SharedPtr	G	VG
+    //	o	En WeakPtr	VG	VG
+
+    WeakPtr<C> wp11;
+    assert(wp11.expired());
+    SharedPtr<C> sp12(new C(12));
+    WeakPtr<C> wp13(wp11);
+    assert(wp13.expired());
+    WeakPtr<C> wp14(sp12);
+    assert(!wp14.expired());
+
+    SharedPtr<C> sp17(wp14);
+    assert(sp17);
+
+    //-	Destruktor	G	VG
+    //	It will test itself
+    //-	Tilldelning från en		
+    //	o	En SharedPtr	G	VG
+    //	o	En WeakPtr			VG
+    WeakPtr<C> wp15;
+    wp14 = wp11;
+    assert(wp14.expired());
+
+    SharedPtr<C> sp33(new C(33));
+    wp14 = sp33;
+    assert(!wp14.expired());
+    wp14 = wp14;
+    assert(!wp14.expired());
+
+    sp33.reset();
+    assert(!sp33);
+    assert(wp14.expired());
+
+    //Shared(weak)
+    try {
+      SharedPtr<C> slask(wp14);
     }
-    assert(b.expired());
+    catch (const char* const except) {
+      assert(except == "std::bad_weak_ptr");
+    }
+
+    //-	funktioner:		
+    //	o	lock()		VG
+    auto sp51 = wp11.lock();
+    assert(!sp51);
+
+    SharedPtr<C>  sp55(new C(55));
+    wp14 = sp55;
+    sp51 = wp14.lock();
+    assert(sp51);
+    ////	o	expired()		VG	Redan testat
+
+    //move
+    SharedPtr<C> sp61(std::move(sp51));
+    assert(sp61->value == 55);
+    assert(!sp51);
+
+    sp51 = std::move(sp61);
+    sp51 = std::move(sp51);
+    assert(sp51->value == 55);
   }
+#endif VG
+
 }

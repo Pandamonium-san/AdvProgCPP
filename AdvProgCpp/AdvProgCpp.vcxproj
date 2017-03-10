@@ -161,6 +161,7 @@
     <ClCompile Include="Link.cpp" />
     <ClCompile Include="List.cpp" />
     <ClCompile Include="Node.cpp" />
+    <ClCompile Include="SharedPtr.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

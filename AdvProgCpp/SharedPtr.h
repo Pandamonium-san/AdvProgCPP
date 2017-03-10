@@ -20,7 +20,9 @@ public:
   }
   unsigned int Release()
   {
-    return --m_count;
+    unsigned int temp = --m_count;
+    ReleaseWeak();
+    return temp;
   }
   unsigned int AddWeak()
   {
@@ -28,7 +30,10 @@ public:
   }
   unsigned int ReleaseWeak()
   {
-    return --m_self;
+    unsigned int temp = --m_self;
+    if (temp == 0)
+      delete this;
+    return temp;
   }
   unsigned int UseCount()
   {
@@ -44,84 +49,21 @@ class SharedPtr
 
   template<class T>
   friend class WeakPtr;
-  bool Invariant() { return true; }// (m_ptr == nullptr && m_counter == nullptr) || (m_ptr != nullptr && m_counter != nullptr); }
 public:
-  SharedPtr()
-  {
-    m_ptr = nullptr;
-    m_counter = nullptr;
-  }
-  SharedPtr(std::nullptr_t nullp)
-  {
-    m_ptr = nullptr;
-    m_counter = nullptr;
-  }
-  SharedPtr(T* ptr)
-  {
-    m_ptr = ptr;
-    if (ptr == nullptr)
-      m_counter = nullptr;
-    else
-      m_counter = new RCounter();
-    assert(Invariant());
-  }
-  SharedPtr(const SharedPtr& other)
-  {
-    m_ptr = other.m_ptr;
-    m_counter = other.m_counter;
-    m_counter->Add();
-    assert(Invariant());
-  }
-  SharedPtr(SharedPtr&& other)
-  {
-    m_ptr = nullptr;
-    m_counter = nullptr;
-    swap(other);
-    assert(Invariant());
-  }
-  template<class T>
-  SharedPtr(const WeakPtr<T>& other)
-  {
-    m_ptr = other.m_ptr;
-    assert(Invariant());
-  }
-  ~SharedPtr()
-  {
-    assert(Invariant());
-    if (m_counter != nullptr && m_counter->Release() == 0) {
-      delete m_ptr;
-      if (m_counter->ReleaseWeak() == 0)
-        delete m_counter;
-    }
-  }
+  SharedPtr();
+  SharedPtr(std::nullptr_t nullp);
+  SharedPtr(T* ptr);
+  SharedPtr(const SharedPtr& other);
+  SharedPtr(SharedPtr&& other);
+  template<class U>
+  SharedPtr(const WeakPtr<U>& other);
+  ~SharedPtr();
 
-  SharedPtr& operator=(const SharedPtr& rhs)
-  {
-    SharedPtr(rhs).swap(*this);
-    assert(Invariant());
-    return *this;
-  }
-  SharedPtr& operator=(SharedPtr&& rhs)
-  {
-    SharedPtr(std::move(rhs)).swap(*this);
-    assert(Invariant());
-    return *this;
-  }
+  SharedPtr& operator=(const SharedPtr& rhs);
+  SharedPtr& operator=(SharedPtr&& rhs);
 
-  void swap(SharedPtr& other)
-  {
-    T* temp = m_ptr;
-    RCounter* temp2 = m_counter;
-    m_ptr = other.m_ptr;
-    m_counter = other.m_counter;
-    other.m_ptr = temp;
-    other.m_counter = temp2;
-  }
-  void reset(T* ptr = nullptr)
-  {
-    SharedPtr(ptr).swap(*this);
-    assert(Invariant());
-  }
+  void swap(SharedPtr& other);
+  void reset(T* ptr = nullptr);
 
   bool unique() { return m_counter->UseCount() == 1; }
   T* get() { return m_ptr; }
@@ -139,33 +81,38 @@ class WeakPtr
   T* m_ptr;
   RCounter* m_counter;
 
+  friend class SharedPtr<T>;
 public:
   WeakPtr()
   {
     m_ptr = nullptr;
     m_counter = nullptr;
   }
-  template<class T>
-  WeakPtr(const SharedPtr<T>& ptr)
+  template<class U>
+  WeakPtr(const SharedPtr<U>& ptr)
   {
     m_ptr = ptr.m_ptr;
     m_counter = ptr.m_counter;
-    m_counter->AddWeak();
+    if (m_counter != nullptr)
+      m_counter->AddWeak();
   }
-  WeakPtr(const WeakPtr& ptr)
+  template<class U>
+  WeakPtr(const WeakPtr<U>& ptr)
   {
     m_ptr = ptr.m_ptr;
     m_counter = ptr.m_counter;
-    m_counter->AddWeak();
+    if (m_counter != nullptr)
+      m_counter->AddWeak();
   }
-  template<class T>
-  WeakPtr& operator=(const SharedPtr<T>& ptr)
+  template<class U>
+  WeakPtr& operator=(const SharedPtr<U>& ptr)
   {
     if (m_counter != nullptr)
       m_counter->ReleaseWeak();
     m_ptr = ptr.m_ptr;
     m_counter = ptr.m_counter;
-    m_counter->AddWeak();
+    if (m_counter != nullptr)
+      m_counter->AddWeak();
     return *this;
   }
   WeakPtr& operator=(const WeakPtr& ptr)
@@ -174,17 +121,31 @@ public:
       m_counter->ReleaseWeak();
     m_ptr = ptr.m_ptr;
     m_counter = ptr.m_counter;
-    m_counter->AddWeak();
+    if (m_counter != nullptr)
+      m_counter->AddWeak();
     return *this;
   }
-
+  ~WeakPtr()
+  {
+    if (m_counter != nullptr)
+      m_counter->ReleaseWeak();
+  }
+  bool expired() const
+  {
+    if (m_counter == nullptr)
+      return true;
+    if (m_counter->UseCount() == 0) {
+      return true;
+    }
+    return false;
+  }
   SharedPtr<T> lock() const
   {
-
-  }
-
-  bool expired()
-  {
-    return m_counter->UseCount() == 0;
+    if (expired()) {
+      return SharedPtr<T>();
+    }
+    else {
+      return SharedPtr<T>(*this);
+    }
   }
 };
