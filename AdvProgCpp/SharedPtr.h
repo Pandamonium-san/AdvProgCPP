@@ -5,17 +5,17 @@
 class RCounter
 {
   int m_count;
-  int m_self;
+  int m_refs;
 public:
   RCounter()
   {
     m_count = 1;
-    m_self = 1;
+    m_refs = 1;
   }
   ~RCounter() {}
   int Add()
   {
-    ++m_self;
+    ++m_refs;
     return ++m_count;
   }
   int Release()
@@ -26,11 +26,11 @@ public:
   }
   int AddWeak()
   {
-    return ++m_self;
+    return ++m_refs;
   }
   int ReleaseWeak()
   {
-    int temp = --m_self;
+    int temp = --m_refs;
     if (temp == 0)
       delete this;
     return temp;

@@ -48,6 +48,12 @@
     <ClInclude Include="SharedPtr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Rational.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GCD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -72,6 +78,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SharedPtr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rational.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

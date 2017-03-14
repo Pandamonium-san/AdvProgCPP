@@ -25,4 +25,10 @@ namespace Tests
 
   void TestSharedPtr();
   void TestSharedPtrVG();
+ 
+  bool TestAccuracy();
+  void TestRationalG();
+  void TestRationalVG();
+
+  void TestRational();
 }
