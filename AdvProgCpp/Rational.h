@@ -21,23 +21,32 @@ public:
   template<class R>
   Rational(const Rational<R>& other) : P(other.P), Q(other.Q) {};
 
-  template<class R>
-  bool operator==(const Rational<R>& other) { return P == other.P && Q == other.Q; }
-  template<class R>
-  bool operator<(const Rational<R>& other) { return P*other.Q < other.P*Q; }
+  bool operator==(const Rational& other) { return P == other.P && Q == other.Q; }
+  bool operator<(const Rational& other) { return P*other.Q < other.P*Q; }
 
-  template<class R>
-  bool operator==(const R& other) { return P / Q == other && P % Q == 0; }
-  template<class R>
-  bool operator<(const R& other) { return P / Q < other; }
+  //template<class R>
+  //bool operator==(const Rational<R>& other) { return P == other.P && Q == other.Q; }
+  //template<class R>
+  //bool operator<(const Rational<R>& other) { return P*other.Q < other.P*Q; }
+
+  //template<class R>
+  //bool operator==(const R& other) { return P / Q == other && P % Q == 0; }
+  //template<class R>
+  //bool operator<(const R& other) { return P / Q < other; }
 
   template <class R> bool operator!=(const R& rhs) { return !(*this == rhs); }
   template <class R> bool operator>(const R& rhs) { return (rhs < *this); }
   template <class R> bool operator>=(const R& rhs) { return !(*this < rhs); }
   template <class R> bool operator<=(const R& rhs) { return !(rhs < *this); }
 
-  Rational operator+(const Rational rhs) const {
-    return Rational(P*rhs.Q + rhs.P*Q, Q*rhs.Q);
-  }
+  template<class R>
+  Rational operator+(const R& other) const { return Rational(P * other + other * Q, Q * other); }
+  template<class R>
+  Rational operator+(const Rational<R>& other) const { return Rational(P * other.Q + other.P * Q, Q * other.Q); }
+//  Rational& operator+=(const Rational& other) { this = this + other; return *this; }
+  //template<class R>
+  //Rational& operator+=(const Rational<R>& other) { this = this + other; return *this; }
+  //template<class R>
+  //Rational& operator+=(const R& other) { this = this + other; return *this; }
 };
 

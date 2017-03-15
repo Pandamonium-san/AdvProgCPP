@@ -1,45 +1,9 @@
 #pragma once
 #include <vector>
+#include <cassert>
 #include <utility>
 
-class RCounter
-{
-  int m_count;
-  int m_refs;
-public:
-  RCounter()
-  {
-    m_count = 1;
-    m_refs = 1;
-  }
-  ~RCounter() {}
-  int Add()
-  {
-    ++m_refs;
-    return ++m_count;
-  }
-  int Release()
-  {
-    int temp = --m_count;
-    ReleaseWeak();
-    return temp;
-  }
-  int AddWeak()
-  {
-    return ++m_refs;
-  }
-  int ReleaseWeak()
-  {
-    int temp = --m_refs;
-    if (temp == 0)
-      delete this;
-    return temp;
-  }
-  int UseCount()
-  {
-    return m_count;
-  }
-};
+class RCounter;
 
 template<class T>
 class SharedPtr
@@ -49,14 +13,23 @@ class SharedPtr
 
   template<class T>
   friend class WeakPtr;
+  template<class T>
+  friend class SharedPtr;
+  bool Invariant() { return (m_ptr == nullptr && m_counter == nullptr) || (m_ptr != nullptr && m_counter != nullptr && m_counter->Invariant()); }
 public:
   SharedPtr();
   SharedPtr(std::nullptr_t nullp);
   SharedPtr(T* ptr);
+  
   SharedPtr(const SharedPtr& other);
   SharedPtr(SharedPtr&& other);
+
   template<class U>
-  SharedPtr(const WeakPtr<U>& other);
+  SharedPtr(const SharedPtr<U>& other);
+  template<class U>
+  SharedPtr(SharedPtr<U>&& other);
+  template<class U>
+  SharedPtr(WeakPtr<U>& other);
   ~SharedPtr();
 
   SharedPtr& operator=(const SharedPtr& rhs);
@@ -79,18 +52,65 @@ class WeakPtr
   T* m_ptr;
   RCounter* m_counter;
 
+  bool Invariant() { return (m_counter == nullptr && m_ptr == nullptr) || m_counter != nullptr; }
   friend class SharedPtr<T>;
 public:
   WeakPtr();
-  template<class U>
-  WeakPtr(const SharedPtr<U>& ptr);
+  WeakPtr(const WeakPtr& ptr);
+  ~WeakPtr();
   template<class U>
   WeakPtr(const WeakPtr<U>& ptr);
-  ~WeakPtr();
+  template<class U>
+  WeakPtr(const SharedPtr<U>& ptr);
 
   template<class U>
   WeakPtr& operator=(const SharedPtr<U>& ptr);
   WeakPtr& operator=(const WeakPtr& ptr);
-  bool expired() const;
-  SharedPtr<T> lock() const;
+  bool expired();
+  SharedPtr<T> lock();
+};
+
+class RCounter
+{
+  long m_count;
+  long m_refs;
+
+public:
+  RCounter()
+  {
+    m_count = 1;
+    m_refs = 1;
+  }
+  ~RCounter() {}
+  long Add()
+  {
+    assert(Invariant());
+    ++m_refs;
+    return ++m_count;
+  }
+  long Release()
+  {
+    assert(Invariant());
+    int temp = --m_count;
+    ReleaseWeak();
+    return temp;
+  }
+  long AddWeak()
+  {
+    assert(Invariant());
+    return ++m_refs;
+  }
+  long ReleaseWeak()
+  {
+    assert(Invariant());
+    long temp = --m_refs;
+    if (temp == 0)
+      delete this;
+    return temp;
+  }
+  long UseCount()
+  {
+    return m_count;
+  }
+  bool Invariant() { return m_count <= m_refs && m_count >= 0; }
 };

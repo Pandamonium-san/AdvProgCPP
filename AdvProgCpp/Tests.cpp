@@ -653,7 +653,13 @@ namespace Tests
     float value;
     C(float value) :value(value) {};
   };
+  struct D : C {
+    D(float value) : C(value) {};
+  };
   void TestSharedPtr() {
+    SharedPtr<D> dptr(new D(5));
+    SharedPtr<C> cptr(dptr);
+
     SharedPtr<C> sp;
     assert(!sp);
     SharedPtr<C> sp2(nullptr);
@@ -708,6 +714,10 @@ namespace Tests
     //	o	inget	G	VG
     //	o	En SharedPtr	G	VG
     //	o	En WeakPtr	VG	VG
+    SharedPtr<C> Sptr(new C(2));
+    WeakPtr<C> Cptr(Sptr);
+    WeakPtr<C> Cptr2(Cptr);
+
 
     WeakPtr<C> wp11;
     assert(wp11.expired());
@@ -775,7 +785,8 @@ namespace Tests
     long l = 100;
     Rational<int> r(1, l);
     Rational<int> p(1, 6);
-    Rational<int> b = r + p;
+    Rational<int> b = r + p + 10;
+    //b += 5;
   }
 
   //#ifdef VG
@@ -828,10 +839,12 @@ namespace Tests
     assert(rs1 == Rational<short>(-rs1.P, -rs1.Q));
 
     ////Tilldelas (=) fr蚣 乃al・dvs. rtal=tal;
-    //rs3 = Rint(13, 3);
-    //assert(rs3 == Rshort(13, 3));
-    //rs3 = rll3 = -17;
-    //assert(rs3 == Rshort(-17));
+    typedef Rational<int> Rint;
+    typedef Rational<short> Rshort;
+    rs3 = Rint(13, 3);
+    assert(rs3 == Rshort(13, 3));
+    rs3 = rll3 = -17;
+    assert(rs3 == Rshort(-17));
 
     ////+= med 乃al・dvs. rtal += tal;
     //assert((rs3 += 4) == Rshort(-13));
