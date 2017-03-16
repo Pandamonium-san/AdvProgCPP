@@ -33,8 +33,8 @@ public:
 
   ValueType& operator[](ptrdiff_t i) const { return *(m_ptr + i * step); }
   operator baseItr<ValueType const, step>() const { return baseItr<ValueType const, step>(m_ptr); }
-  bool operator<(const baseItr& rhs) const { return (m_ptr - rhs.m_ptr)*step < 0; }
-  bool operator>(const baseItr& rhs) const { return (m_ptr - rhs.m_ptr)*step > 0; }
+  friend bool operator<(const baseItr& lhs, const baseItr& rhs) { return (lhs.m_ptr - rhs.m_ptr)*step < 0; }
+  friend bool operator>(const baseItr& lhs, const baseItr& rhs) { return (lhs.m_ptr - rhs.m_ptr)*step > 0; }
 };
 
 //#pragma once

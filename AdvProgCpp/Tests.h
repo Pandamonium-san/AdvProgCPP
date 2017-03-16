@@ -27,8 +27,8 @@ namespace Tests
   void TestSharedPtrVG();
  
   bool TestAccuracy();
+  void TestRational();
   void TestRationalG();
   void TestRationalVG();
 
-  void TestRational();
 }

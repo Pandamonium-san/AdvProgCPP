@@ -30,11 +30,12 @@ int main()
   //TestStringItr();
   //TestItt();
   
-  TestSharedPtr();
-  TestSharedPtrVG();
+  //TestSharedPtr();
+  //TestSharedPtrVG();
 
-  /*TestRational();
-  TestRationalG();*/
+  TestRational();
+  TestRationalG();
+  //TestRationalVG();
 
   std::cin.get();
   return 0;
