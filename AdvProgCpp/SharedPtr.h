@@ -15,7 +15,9 @@ class SharedPtr
   friend class WeakPtr;
   template<class T>
   friend class SharedPtr;
-  bool Invariant() { return (m_ptr == nullptr && m_counter == nullptr) || (m_ptr != nullptr && m_counter != nullptr && m_counter->Invariant()); }
+  bool Invariant() const { 
+    return (m_ptr == nullptr && m_counter == nullptr) || (m_ptr != nullptr && m_counter != nullptr && m_counter->Invariant() && m_counter->UseCount() > 0); 
+  }
 public:
   SharedPtr();
   SharedPtr(std::nullptr_t nullp);
@@ -37,13 +39,16 @@ public:
   void swap(SharedPtr& other);
   void reset(T* ptr = nullptr);
 
-  bool unique() { return m_counter->UseCount() == 1; }
+  bool unique() const { return m_counter->UseCount() == 1; }
   T* get() { return m_ptr; }
+  const T* get() const { return m_ptr; }
   T* operator->() { return m_ptr; }
+  const T* operator->() const { return m_ptr; }
   T& operator*() { return *m_ptr; }
-  bool operator==(const SharedPtr& rhs) { return m_ptr == rhs.m_ptr; }
-  bool operator<(const SharedPtr& rhs) { return m_ptr < rhs.m_ptr; }
-  explicit operator bool() { return m_ptr != nullptr; }
+  const T& operator*() const { return *m_ptr; }
+  bool operator==(const SharedPtr& rhs) const { return m_ptr == rhs.m_ptr; }
+  bool operator<(const SharedPtr& rhs) const { return m_ptr < rhs.m_ptr; }
+  explicit operator bool() const { return m_ptr != nullptr; }
 };
 
 template<class T>
@@ -52,20 +57,20 @@ class WeakPtr
   T* m_ptr;
   RCounter* m_counter;
 
-  bool Invariant() { return (m_counter == nullptr && m_ptr == nullptr) || m_counter != nullptr; }
+  bool Invariant() const { return (m_counter == nullptr && m_ptr == nullptr) || (m_counter != nullptr && m_counter->Invariant() && m_counter->m_refs > 0); }
   friend class SharedPtr<T>;
 public:
   WeakPtr();
-  WeakPtr(const WeakPtr& ptr);
+  WeakPtr(WeakPtr& ptr);
   ~WeakPtr();
   template<class U>
-  WeakPtr(const WeakPtr<U>& ptr);
+  WeakPtr(WeakPtr<U>& ptr);
   template<class U>
   WeakPtr(const SharedPtr<U>& ptr);
 
   template<class U>
   WeakPtr& operator=(const SharedPtr<U>& ptr);
-  WeakPtr& operator=(const WeakPtr& ptr);
+  WeakPtr& operator=(WeakPtr& ptr);
   bool expired();
   SharedPtr<T> lock();
 };
@@ -74,7 +79,8 @@ class RCounter
 {
   long m_count;
   long m_refs;
-
+  template<class T>
+  friend class WeakPtr;
 public:
   RCounter()
   {
@@ -108,9 +114,9 @@ public:
       delete this;
     return temp;
   }
-  long UseCount()
+  long UseCount() const
   {
     return m_count;
   }
-  bool Invariant() { return m_count <= m_refs && m_count >= 0; }
+  bool Invariant() const { return m_count <= m_refs && m_count >= 0 && m_refs > 0; }
 };

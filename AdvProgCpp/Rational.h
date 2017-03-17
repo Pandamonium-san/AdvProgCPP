@@ -14,11 +14,16 @@ public:
   T_int P, Q;
 
   Rational() : P(0), Q(1) {};
-  template<typename U>
-  Rational(U p) : P(p), Q(1) {};
-  template<typename U, typename V>
-  Rational(U p, V q) : P(p), Q(q) {
-    Reduce(P, Q);
+  //template<typename U>
+  //Rational(T_int p) : P(p), Q(1) {};
+  template <typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
+  Rational(T p) : P(p), Q(1) {}
+  template <typename T, typename U, class = typename std::enable_if<std::is_integral<T>::value && std::is_integral<U>::value>::type>
+  Rational(T p, U q) {
+    long long lp = p, lq = q;
+    Reduce(lp, lq);
+    P = lp;
+    Q = lq;
     if (Q < 0) {
       Q *= -1;
       P *= -1;
@@ -28,7 +33,13 @@ public:
   Rational(const Rational<R>& other) : P(other.P), Q(other.Q) {};
 
   template<typename R>
-  Rational operator+(const Rational<R>& other) const { return Rational(P * other.Q + other.P * Q, Q * other.Q); }
+  Rational operator+(const Rational<R>& other) const {
+    long long p, q;
+    p = (long long)P * (long long)other.Q + (long long)other.P * (long long)Q;
+    q = (long long)Q * (long long)other.Q;
+    Reduce(p, q);
+    return Rational(p, q);
+  }
   Rational operator+(const T_int& other) const { return Rational(P + other * Q, Q); }
   template<typename R>
   Rational& operator+=(const Rational<R>& other) { *this = *this + other; return *this; }
@@ -55,11 +66,14 @@ public:
     cout << R.P << '/' << R.Q;
     return cout;
   }
-  friend std::istream& operator>> (std::istream & cin, Rational& R) {
+  friend std::istream& operator >> (std::istream & cin, Rational& R) {
     cin >> R.P;
     cin.ignore(1);
     cin >> R.Q;
     return cin;
+  }
+  bool Invariant() {
+    return Q > 0;
   }
 };
 

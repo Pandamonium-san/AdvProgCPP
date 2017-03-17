@@ -69,8 +69,7 @@ SharedPtr<T>::SharedPtr(WeakPtr<U>& other)
     throw "std::bad_weak_ptr";
   m_ptr = other.m_ptr;
   m_counter = other.m_counter;
-  if (m_counter != nullptr)
-    m_counter->Add();
+  m_counter->Add();
   assert(Invariant());
 }
 template<class T>
@@ -127,8 +126,9 @@ WeakPtr<T>::~WeakPtr()
     m_counter->ReleaseWeak();
 }
 template<class T>
-WeakPtr<T>::WeakPtr(const WeakPtr& ptr)
+WeakPtr<T>::WeakPtr(WeakPtr& ptr)
 {
+  ptr.expired();
   m_ptr = ptr.m_ptr;
   m_counter = ptr.m_counter;
   if (m_counter != nullptr)
@@ -147,8 +147,9 @@ WeakPtr<T>::WeakPtr(const SharedPtr<U>& ptr)
 }
 template<class T>
 template<class U>
-WeakPtr<T>::WeakPtr(const WeakPtr<U>& ptr)
+WeakPtr<T>::WeakPtr(WeakPtr<U>& ptr)
 {
+  ptr.expired();
   m_ptr = ptr.m_ptr;
   m_counter = ptr.m_counter;
   if (m_counter != nullptr)
@@ -169,8 +170,9 @@ WeakPtr<T>& WeakPtr<T>::operator=(const SharedPtr<U>& ptr)
   return *this;
 }
 template<class T>
-WeakPtr<T>& WeakPtr<T>::operator=(const WeakPtr& ptr)
+WeakPtr<T>& WeakPtr<T>::operator=(WeakPtr& ptr)
 {
+  ptr.expired();
   if (m_counter != nullptr)
     m_counter->ReleaseWeak();
   m_ptr = ptr.m_ptr;

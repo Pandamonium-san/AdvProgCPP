@@ -867,7 +867,7 @@ namespace Tests
     assert(i == 2);
 
     // Overloading av << och >> (ut och in matning)
-    std::cout << "Utmatning>" << rs3 << "< skriv in texten mellan > och < + retur\n";
+    std::cout << "Utmatning >" << rs3 << "< skriv in texten mellan > och < + retur\n";
     std::cin >> rs2;
     assert(rs3 == rs2);
   }
