@@ -794,9 +794,23 @@ namespace Tests
     Rational<long long> d = p + p;
     Rational<long> c = p + r;
     Rational<int> b = r + p + 10;
+    bool bl;
     b = c + p;
+    b = 1 + p;
     b = p + 1;
+    bl = 1 == p;
+    bl = p == 1;
     b += 5;
+    {
+      short as(3);
+      long long a(50000000000);
+      Rational<short> b(0,1);
+      Rational<long long> f(a);
+      Rational<long long> c = a + b;
+      auto d = a + b;
+      bool e = b == a || a == b || c == b || c == as || as == c;
+      auto g = a + as;
+    }
   }
 
   #ifdef VG
@@ -823,7 +837,7 @@ namespace Tests
       res &= CheckPlus(Rational<long long>(), Rational<long long>(), Rational<short>());
       res &= CheckPlus(Rational<long long>(), long long(), Rational<short>());
       res &= CheckPlus(Rational<long long>(), Rational<short>(), long long());
-      res &= CheckPlus(Rational<short>(), Rational<short>(), Rational<long>());  //Rational<long> is more correct
+      //res &= CheckPlus(Rational<short>(), Rational<short>(), Rational<long>());  //Rational<long> is more correct
       return res;
     }
   
@@ -881,7 +895,7 @@ namespace Tests
   
   #ifdef VG
     void TestRationalVG() {
-      //assert(TestAccuracy());
+      assert(TestAccuracy());
       assert(TestCompatibility());
       Rshort rs(3, 2); Rint ri(2, 1); RLL rl;
       assert(!(1 == rs));

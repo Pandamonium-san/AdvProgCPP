@@ -39,7 +39,7 @@ int main()
   TestRational();
   TestRationalG();
   TestRationalVG();
-  //TestAccuracy();
+
   std::cin.get();
   return 0;
 }

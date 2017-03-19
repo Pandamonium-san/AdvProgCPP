@@ -14,14 +14,13 @@ public:
   T_int P, Q;
 
   Rational() : P(0), Q(1) {};
-  template <typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
-  Rational(T p) : P(p), Q(1) {}
-  template <typename T, typename U, class = typename std::enable_if<std::is_integral<T>::value && std::is_integral<U>::value>::type>
-  Rational(T p, U q) {
-    long long lp = p, lq = q;
-    Reduce(lp, lq);
-    P = lp;
-    Q = lq;
+  //template <typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
+  Rational(T_int p) : P(p), Q(1) {}
+  //template <typename T, typename U, class = typename std::enable_if<std::is_integral<T>::value && std::is_integral<U>::value>::type>
+  Rational(T_int p, T_int q) {
+    Reduce(p, q);
+    P = p;
+    Q = q;
     if (Q < 0) {
       Q *= -1;
       P *= -1;
@@ -34,50 +33,66 @@ public:
   friend typename std::enable_if<(sizeof(T_int) >= sizeof(T) && std::is_integral<T>::value), Rational<T_int>>::type
     operator+(const Rational<T_int>& lhs, const Rational<T>& rhs)
   {
-    return Rational<T_int>(lhs.P*rhs.Q + rhs.P*lhs.Q, lhs.Q*rhs.Q);
+    return Rational<T_int>(lhs) += rhs;
   }
   template<class T>
   friend typename std::enable_if<(sizeof(T_int) < sizeof(T) && std::is_integral<T>::value), Rational<T>>::type
     operator+(const Rational<T_int>& lhs, const Rational<T>& rhs)
   {
-    return Rational<T>(lhs.P*rhs.Q + rhs.P*lhs.Q, lhs.Q*rhs.Q);
+    return Rational<T>(lhs) += rhs;
   }
-
   template<class T>
   friend typename std::enable_if<(sizeof(T_int) >= sizeof(T) && std::is_integral<T>::value), Rational<T_int>>::type
-    operator+(const T_int& lhs, const Rational<T>& rhs)
+    operator+(const T& lhs, const Rational<T_int>& rhs)
   {
-    return Rational<T_int>(lhs*rhs.Q + rhs.P, rhs.Q);
+    return Rational<T_int>(lhs) += rhs;
   }
   template<class T>
   friend typename std::enable_if<(sizeof(T_int) < sizeof(T) && std::is_integral<T>::value), Rational<T>>::type
-    operator+(const T_int& lhs, const Rational<T>& rhs)
+    operator+(const T& lhs, const Rational<T_int>& rhs)
   {
-    return Rational<T>(lhs*rhs.Q + rhs.P, rhs.Q);
+    return Rational<T>(lhs) += rhs;
   }
-
   template<class T>
   friend typename std::enable_if<(sizeof(T_int) >= sizeof(T) && std::is_integral<T>::value), Rational<T_int>>::type
     operator+(const Rational<T_int>& lhs, const T& rhs)
   {
-    return Rational<T_int>(lhs.P + rhs*lhs.Q, lhs.Q);
+    return Rational<T_int>(lhs) += rhs;
   }
   template<class T>
   friend typename std::enable_if<(sizeof(T_int) < sizeof(T) && std::is_integral<T>::value), Rational<T>>::type
     operator+(const Rational<T_int>& lhs, const T& rhs)
   {
-    return Rational<T>(lhs.P + rhs*lhs.Q, lhs.Q);
+    return Rational<T>(lhs) += rhs;
   }
 
-  template<typename R>
-  Rational& operator+=(const Rational<R>& other) { *this = *this + other; return *this; }
-  Rational& operator+=(const T_int& other) { *this = *this + other; return *this; }
+  template<typename T>
+  Rational& operator+=(const Rational<T>& rhs) {
+    next_size<T_int>::type p = P, q = Q;
+    p = p * rhs.Q + rhs.P*q;
+    q = q * rhs.Q;
+    Reduce(p, q);
+    P = p;
+    Q = q;
+    return *this;
+  }
+  template<typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
+  Rational& operator+=(const T& rhs) {
+    next_size<T_int>::type p = P, q;
+    p = p + rhs*Q;
+    q = Q;
+    Reduce(p, q);
+    P = p;
+    Q = q;
+    return *this;
+  }
+
   Rational& operator++() { return *this += 1; }
   Rational operator++(int) { auto temp(*this); *this += 1; return temp; }
   Rational operator-() const { return Rational(-P, Q); }
 
   template<typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
-  explicit operator T() const { return (T)(P / Q); }
+  explicit operator T() const { return (T)P / (T)Q; }
 
   bool operator==(const Rational& other) const { return P == other.P && Q == other.Q; }
   bool operator<(const Rational& other) const { return P*other.Q < other.P*Q; }
@@ -102,3 +117,6 @@ public:
   }
 };
 
+template<class T> struct next_size { typedef T type; };
+template<> struct next_size<short> { typedef int type; }; 
+template<> struct next_size<int> { typedef long long type; };
