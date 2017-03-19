@@ -16,6 +16,9 @@
 using namespace std;
 using namespace Tests;
 
+#include <limits>
+#include <type_traits>
+
 int main()
 {
   _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -35,7 +38,7 @@ int main()
 
   TestRational();
   TestRationalG();
-  //TestRationalVG();
+  TestRationalVG();
   //TestAccuracy();
   std::cin.get();
   return 0;

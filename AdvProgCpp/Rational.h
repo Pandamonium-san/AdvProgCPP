@@ -7,15 +7,13 @@ template <typename T, typename R> bool operator>(const T& lhs, const R& rhs) { r
 template <typename T, typename R> bool operator>=(const T& lhs, const R& rhs) { return !(lhs < rhs); }
 template <typename T, typename R> bool operator<=(const T& lhs, const R& rhs) { return !(rhs < lhs); }
 
-template<typename T_int>
+template<typename T_int, class = typename std::enable_if<std::is_integral<T_int>::value>::type>
 class Rational
 {
 public:
   T_int P, Q;
 
   Rational() : P(0), Q(1) {};
-  //template<typename U>
-  //Rational(T_int p) : P(p), Q(1) {};
   template <typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
   Rational(T p) : P(p), Q(1) {}
   template <typename T, typename U, class = typename std::enable_if<std::is_integral<T>::value && std::is_integral<U>::value>::type>
@@ -32,15 +30,45 @@ public:
   template<typename R>
   Rational(const Rational<R>& other) : P(other.P), Q(other.Q) {};
 
-  template<typename R>
-  Rational operator+(const Rational<R>& other) const {
-    long long p, q;
-    p = (long long)P * (long long)other.Q + (long long)other.P * (long long)Q;
-    q = (long long)Q * (long long)other.Q;
-    Reduce(p, q);
-    return Rational(p, q);
+  template<class T>
+  friend typename std::enable_if<(sizeof(T_int) >= sizeof(T) && std::is_integral<T>::value), Rational<T_int>>::type
+    operator+(const Rational<T_int>& lhs, const Rational<T>& rhs)
+  {
+    return Rational<T_int>(lhs.P*rhs.Q + rhs.P*lhs.Q, lhs.Q*rhs.Q);
   }
-  Rational operator+(const T_int& other) const { return Rational(P + other * Q, Q); }
+  template<class T>
+  friend typename std::enable_if<(sizeof(T_int) < sizeof(T) && std::is_integral<T>::value), Rational<T>>::type
+    operator+(const Rational<T_int>& lhs, const Rational<T>& rhs)
+  {
+    return Rational<T>(lhs.P*rhs.Q + rhs.P*lhs.Q, lhs.Q*rhs.Q);
+  }
+
+  template<class T>
+  friend typename std::enable_if<(sizeof(T_int) >= sizeof(T) && std::is_integral<T>::value), Rational<T_int>>::type
+    operator+(const T_int& lhs, const Rational<T>& rhs)
+  {
+    return Rational<T_int>(lhs*rhs.Q + rhs.P, rhs.Q);
+  }
+  template<class T>
+  friend typename std::enable_if<(sizeof(T_int) < sizeof(T) && std::is_integral<T>::value), Rational<T>>::type
+    operator+(const T_int& lhs, const Rational<T>& rhs)
+  {
+    return Rational<T>(lhs*rhs.Q + rhs.P, rhs.Q);
+  }
+
+  template<class T>
+  friend typename std::enable_if<(sizeof(T_int) >= sizeof(T) && std::is_integral<T>::value), Rational<T_int>>::type
+    operator+(const Rational<T_int>& lhs, const T& rhs)
+  {
+    return Rational<T_int>(lhs.P + rhs*lhs.Q, lhs.Q);
+  }
+  template<class T>
+  friend typename std::enable_if<(sizeof(T_int) < sizeof(T) && std::is_integral<T>::value), Rational<T>>::type
+    operator+(const Rational<T_int>& lhs, const T& rhs)
+  {
+    return Rational<T>(lhs.P + rhs*lhs.Q, lhs.Q);
+  }
+
   template<typename R>
   Rational& operator+=(const Rational<R>& other) { *this = *this + other; return *this; }
   Rational& operator+=(const T_int& other) { *this = *this + other; return *this; }
@@ -48,9 +76,8 @@ public:
   Rational operator++(int) { auto temp(*this); *this += 1; return temp; }
   Rational operator-() const { return Rational(-P, Q); }
 
-  explicit operator short() const { return P / Q; }
-  explicit operator int() const { return P / Q; }
-  explicit operator long long() const { return P / Q; }
+  template<typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
+  explicit operator T() const { return (T)(P / Q); }
 
   bool operator==(const Rational& other) const { return P == other.P && Q == other.Q; }
   bool operator<(const Rational& other) const { return P*other.Q < other.P*Q; }
@@ -59,8 +86,6 @@ public:
   friend bool operator==(const T_int& lhs, const Rational<R>& rhs) { return lhs*rhs.Q == rhs.P; }
   template <typename R>
   friend bool operator<(const T_int& lhs, const Rational<R>& rhs) { return lhs*rhs.Q < rhs.P; }
-  template<typename R>
-  friend Rational operator+(const T_int& lhs, const Rational<R>& rhs) { return Rational(lhs * rhs.Q + rhs.P, rhs.Q); }
 
   friend std::ostream& operator<< (std::ostream & cout, Rational R) {
     cout << R.P << '/' << R.Q;
