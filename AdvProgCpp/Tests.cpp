@@ -900,6 +900,9 @@ namespace Tests
       Rshort rs(3, 2); Rint ri(2, 1); RLL rl;
       assert(!(1 == rs));
       assert(2 == ri);
+      assert(ri == 2);
+      assert(ri > 1);
+      assert(1 < ri);
     }
   
   #endif

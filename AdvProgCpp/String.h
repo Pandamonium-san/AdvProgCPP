@@ -3,7 +3,6 @@
 #include <iterator>
 #include "StringItr.h"
 
-
 class String
 {
   int m_capacity;

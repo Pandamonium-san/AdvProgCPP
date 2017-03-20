@@ -7,6 +7,10 @@ template <typename T, typename R> bool operator>(const T& lhs, const R& rhs) { r
 template <typename T, typename R> bool operator>=(const T& lhs, const R& rhs) { return !(lhs < rhs); }
 template <typename T, typename R> bool operator<=(const T& lhs, const R& rhs) { return !(rhs < lhs); }
 
+template<class T> struct next_size { typedef T type; };
+template<> struct next_size<short> { typedef int type; };
+template<> struct next_size<int> { typedef long long type; };
+
 template<typename T_int, class = typename std::enable_if<std::is_integral<T_int>::value>::type>
 class Rational
 {
@@ -14,9 +18,7 @@ public:
   T_int P, Q;
 
   Rational() : P(0), Q(1) {};
-  //template <typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
   Rational(T_int p) : P(p), Q(1) {}
-  //template <typename T, typename U, class = typename std::enable_if<std::is_integral<T>::value && std::is_integral<U>::value>::type>
   Rational(T_int p, T_int q) {
     Reduce(p, q);
     P = p;
@@ -28,6 +30,7 @@ public:
   }
   template<typename R>
   Rational(const Rational<R>& other) : P(other.P), Q(other.Q) {};
+  ~Rational() { assert(Invariant()); }
 
   template<class T>
   friend typename std::enable_if<(sizeof(T_int) >= sizeof(T) && std::is_integral<T>::value), Rational<T_int>>::type
@@ -97,10 +100,15 @@ public:
   bool operator==(const Rational& other) const { return P == other.P && Q == other.Q; }
   bool operator<(const Rational& other) const { return P*other.Q < other.P*Q; }
 
-  template <typename R>
-  friend bool operator==(const T_int& lhs, const Rational<R>& rhs) { return lhs*rhs.Q == rhs.P; }
-  template <typename R>
-  friend bool operator<(const T_int& lhs, const Rational<R>& rhs) { return lhs*rhs.Q < rhs.P; }
+  template <typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
+  friend bool operator==(const Rational& lhs, const T& rhs) { return rhs*lhs.Q == lhs.P; }
+  template <typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
+  friend bool operator==(const T& lhs, const Rational& rhs) { return lhs*rhs.Q == rhs.P; }
+
+  template <typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
+  friend bool operator<(const Rational& lhs, const T& rhs) { return rhs*lhs.Q < lhs.P; }
+  template <typename T, class = typename std::enable_if<std::is_integral<T>::value>::type>
+  friend bool operator<(const T& lhs, const Rational& rhs) { return lhs*rhs.Q < rhs.P; }
 
   friend std::ostream& operator<< (std::ostream & cout, Rational R) {
     cout << R.P << '/' << R.Q;
@@ -116,7 +124,3 @@ public:
     return Q > 0;
   }
 };
-
-template<class T> struct next_size { typedef T type; };
-template<> struct next_size<short> { typedef int type; }; 
-template<> struct next_size<int> { typedef long long type; };
